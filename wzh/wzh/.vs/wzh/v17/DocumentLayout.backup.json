@@ -1,0 +1,256 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\Gitee\\wzh-and-zx\\wzh\\wzh\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{6A0A577E-2382-4B0F-B8EC-9880F84E778F}|http://localhost:19881|d:\\gitee\\wzh-and-zx\\wzh\\web\\app_code\\mergegridviewcell1.cs.exclude||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6A0A577E-2382-4B0F-B8EC-9880F84E778F}|http://localhost:19881|d:\\gitee\\wzh-and-zx\\wzh\\web\\app_code\\mss.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6A0A577E-2382-4B0F-B8EC-9880F84E778F}|http://localhost:19881|d:\\gitee\\wzh-and-zx\\wzh\\web\\app_code\\pagecom.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6A0A577E-2382-4B0F-B8EC-9880F84E778F}|http://localhost:19881|d:\\gitee\\wzh-and-zx\\wzh\\web\\app_code\\params.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6A0A577E-2382-4B0F-B8EC-9880F84E778F}|http://localhost:19881|d:\\gitee\\wzh-and-zx\\wzh\\web\\app_code\\tableapi.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6A0A577E-2382-4B0F-B8EC-9880F84E778F}|http://localhost:19881|d:\\gitee\\wzh-and-zx\\wzh\\web\\app_code\\tpvb.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6A0A577E-2382-4B0F-B8EC-9880F84E778F}|http://localhost:19881|d:\\gitee\\wzh-and-zx\\wzh\\web\\app_code\\da\\m_first_chk_step2da.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6A0A577E-2382-4B0F-B8EC-9880F84E778F}|http://localhost:19881|d:\\gitee\\wzh-and-zx\\wzh\\web\\app_code\\da\\t_buliangda.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6A0A577E-2382-4B0F-B8EC-9880F84E778F}|http://localhost:19881|d:\\gitee\\wzh-and-zx\\wzh\\web\\default2.aspx.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6A0A577E-2382-4B0F-B8EC-9880F84E778F}|http://localhost:19881|d:\\gitee\\wzh-and-zx\\wzh\\web\\default.aspx.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6A0A577E-2382-4B0F-B8EC-9880F84E778F}|http://localhost:19881|d:\\gitee\\wzh-and-zx\\wzh\\web\\changehan.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6A0A577E-2382-4B0F-B8EC-9880F84E778F}|http://localhost:19881|d:\\gitee\\wzh-and-zx\\wzh\\web\\bootstrap.min.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6A0A577E-2382-4B0F-B8EC-9880F84E778F}|http://localhost:19881|d:\\gitee\\wzh-and-zx\\wzh\\web\\app_code\\comddl.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6A0A577E-2382-4B0F-B8EC-9880F84E778F}|http://localhost:19881|d:\\gitee\\wzh-and-zx\\wzh\\web\\scsj.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "MergeGridViewCell1.cs.exclude",
+              "DocumentMoniker": "D:\\Gitee\\wzh-and-zx\\wzh\\web\\App_Code\\MergeGridViewCell1.cs.exclude",
+              "RelativeDocumentMoniker": "..\\web\\App_Code\\MergeGridViewCell1.cs.exclude",
+              "ToolTip": "D:\\Gitee\\wzh-and-zx\\wzh\\web\\App_Code\\MergeGridViewCell1.cs.exclude",
+              "RelativeToolTip": "..\\web\\App_Code\\MergeGridViewCell1.cs.exclude",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-12-08T08:59:35.131Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Mss.vb",
+              "DocumentMoniker": "D:\\Gitee\\wzh-and-zx\\wzh\\web\\App_Code\\Mss.vb",
+              "RelativeDocumentMoniker": "..\\web\\App_Code\\Mss.vb",
+              "ToolTip": "D:\\Gitee\\wzh-and-zx\\wzh\\web\\App_Code\\Mss.vb",
+              "RelativeToolTip": "..\\web\\App_Code\\Mss.vb",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2025-12-08T08:59:34.242Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "ParamS.vb",
+              "DocumentMoniker": "D:\\Gitee\\wzh-and-zx\\wzh\\web\\App_Code\\ParamS.vb",
+              "RelativeDocumentMoniker": "..\\web\\App_Code\\ParamS.vb",
+              "ToolTip": "D:\\Gitee\\wzh-and-zx\\wzh\\web\\App_Code\\ParamS.vb",
+              "RelativeToolTip": "..\\web\\App_Code\\ParamS.vb",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2025-12-08T08:59:32.724Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "TableApi.vb",
+              "DocumentMoniker": "D:\\Gitee\\wzh-and-zx\\wzh\\web\\App_Code\\TableApi.vb",
+              "RelativeDocumentMoniker": "..\\web\\App_Code\\TableApi.vb",
+              "ToolTip": "D:\\Gitee\\wzh-and-zx\\wzh\\web\\App_Code\\TableApi.vb",
+              "RelativeToolTip": "..\\web\\App_Code\\TableApi.vb",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2025-12-08T08:59:30.975Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "TPVB.vb",
+              "DocumentMoniker": "D:\\Gitee\\wzh-and-zx\\wzh\\web\\App_Code\\TPVB.vb",
+              "RelativeDocumentMoniker": "..\\web\\App_Code\\TPVB.vb",
+              "ToolTip": "D:\\Gitee\\wzh-and-zx\\wzh\\web\\App_Code\\TPVB.vb",
+              "RelativeToolTip": "..\\web\\App_Code\\TPVB.vb",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2025-12-08T08:59:29.393Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "t_BuLiangDA.vb",
+              "DocumentMoniker": "D:\\Gitee\\wzh-and-zx\\wzh\\web\\App_Code\\DA\\t_BuLiangDA.vb",
+              "RelativeDocumentMoniker": "..\\web\\App_Code\\DA\\t_BuLiangDA.vb",
+              "ToolTip": "D:\\Gitee\\wzh-and-zx\\wzh\\web\\App_Code\\DA\\t_BuLiangDA.vb",
+              "RelativeToolTip": "..\\web\\App_Code\\DA\\t_BuLiangDA.vb",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2025-12-08T08:59:19.569Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "m_first_chk_step2DA.vb",
+              "DocumentMoniker": "D:\\Gitee\\wzh-and-zx\\wzh\\web\\App_Code\\DA\\m_first_chk_step2DA.vb",
+              "RelativeDocumentMoniker": "..\\web\\App_Code\\DA\\m_first_chk_step2DA.vb",
+              "ToolTip": "D:\\Gitee\\wzh-and-zx\\wzh\\web\\App_Code\\DA\\m_first_chk_step2DA.vb",
+              "RelativeToolTip": "..\\web\\App_Code\\DA\\m_first_chk_step2DA.vb",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2025-12-08T08:59:18.64Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "Default.aspx.vb",
+              "DocumentMoniker": "D:\\Gitee\\wzh-and-zx\\wzh\\web\\Default.aspx.vb",
+              "RelativeDocumentMoniker": "..\\web\\Default.aspx.vb",
+              "ToolTip": "D:\\Gitee\\wzh-and-zx\\wzh\\web\\Default.aspx.vb",
+              "RelativeToolTip": "..\\web\\Default.aspx.vb",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2025-12-08T08:59:06.205Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "ChangeHan.html",
+              "DocumentMoniker": "D:\\Gitee\\wzh-and-zx\\wzh\\web\\ChangeHan.html",
+              "RelativeDocumentMoniker": "..\\web\\ChangeHan.html",
+              "ToolTip": "D:\\Gitee\\wzh-and-zx\\wzh\\web\\ChangeHan.html",
+              "RelativeToolTip": "..\\web\\ChangeHan.html",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
+              "WhenOpened": "2025-12-08T08:59:04.997Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "bootstrap.min.css",
+              "DocumentMoniker": "D:\\Gitee\\wzh-and-zx\\wzh\\web\\bootstrap.min.css",
+              "RelativeDocumentMoniker": "..\\web\\bootstrap.min.css",
+              "ToolTip": "D:\\Gitee\\wzh-and-zx\\wzh\\web\\bootstrap.min.css",
+              "RelativeToolTip": "..\\web\\bootstrap.min.css",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2025-12-08T08:59:03.929Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "ComDDL.vb",
+              "DocumentMoniker": "D:\\Gitee\\wzh-and-zx\\wzh\\web\\App_Code\\ComDDL.vb",
+              "RelativeDocumentMoniker": "..\\web\\App_Code\\ComDDL.vb",
+              "ToolTip": "D:\\Gitee\\wzh-and-zx\\wzh\\web\\App_Code\\ComDDL.vb",
+              "RelativeToolTip": "..\\web\\App_Code\\ComDDL.vb",
+              "ViewState": "AgIAABcAAAAAAAAAAAAiwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2025-12-08T08:58:54.234Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "PageCom.vb",
+              "DocumentMoniker": "D:\\Gitee\\wzh-and-zx\\wzh\\web\\App_Code\\PageCom.vb",
+              "RelativeDocumentMoniker": "..\\web\\App_Code\\PageCom.vb",
+              "ToolTip": "D:\\Gitee\\wzh-and-zx\\wzh\\web\\App_Code\\PageCom.vb",
+              "RelativeToolTip": "..\\web\\App_Code\\PageCom.vb",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2025-12-08T08:58:42.976Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "scsj.css",
+              "DocumentMoniker": "D:\\Gitee\\wzh-and-zx\\wzh\\web\\scsj.css",
+              "RelativeDocumentMoniker": "..\\web\\scsj.css",
+              "ToolTip": "D:\\Gitee\\wzh-and-zx\\wzh\\web\\scsj.css",
+              "RelativeToolTip": "..\\web\\scsj.css",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2025-12-08T05:33:29.518Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Default2.aspx.vb",
+              "DocumentMoniker": "D:\\Gitee\\wzh-and-zx\\wzh\\web\\Default2.aspx.vb",
+              "RelativeDocumentMoniker": "..\\web\\Default2.aspx.vb",
+              "ToolTip": "D:\\Gitee\\wzh-and-zx\\wzh\\web\\Default2.aspx.vb",
+              "RelativeToolTip": "..\\web\\Default2.aspx.vb",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwMAAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2025-12-08T05:31:57.685Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{e5c86464-96be-4d7c-9a8b-abcb3bbf5f92}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

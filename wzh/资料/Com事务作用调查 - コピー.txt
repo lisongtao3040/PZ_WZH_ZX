@@ -1,0 +1,65 @@
+结论：
+- 每个方法调用都是独立的COM+方法调用
+- COM+事务边界在方法调用级别，而不是对象实例级别
+- ASP没有能力创建或维护跨多个方法调用的事务上下文
+- 每个InsertJson调用都独立地创建和结束自己的事务
+
+也就跟我说的一样，其实现在的COM事务是没有整体作用的。
+
+
+验证：
+COM：SQL
+    strSQL = ""
+    strSQL = strSQL & "INSERT INTO test "
+    strSQL = strSQL & "   ( "
+    strSQL = strSQL & "     a1 "
+    strSQL = strSQL & "   ) "
+    strSQL = strSQL & " VALUES "
+    strSQL = strSQL & "   ( "
+    strSQL = strSQL & "     ? "
+    strSQL = strSQL & "   ) "
+    
+    strSQL = strSQL & "INSERT INTO test "
+    strSQL = strSQL & "   ( "
+    strSQL = strSQL & "     a1 "
+    strSQL = strSQL & "   ) "
+    strSQL = strSQL & " VALUES "
+    strSQL = strSQL & "   ( "
+    strSQL = strSQL & "     ? "
+    strSQL = strSQL & "   ) "
+
+    一次调用 登录两条
+
+ケース１：
+  Dim objBiz
+  Set objBiz = CreateObject("SAPFRONTCOM0001.ResultHistoryManage")
+  Call objBiz.InsertTest("sapfront_tx",1,1)
+  Set objBiz = Nothing
+
+  
+  Set objBiz2 = CreateObject("SAPFRONTCOM0001.ResultHistoryManage")
+  Call objBiz2.InsertTest("sapfront_tx",2,"a")' 错误登录 Error
+  Set objBiz2 = Nothing
+  结果：登录2条 1 的数据
+  结论：事物分别起作用 ，第二个调用NG，并没回滚第一个
+
+ケース2：
+  Dim objBiz
+  Set objBiz = CreateObject("SAPFRONTCOM0001.ResultHistoryManage")
+  Call objBiz.InsertTest("sapfront_tx",1,1)
+  Call objBiz2.InsertTest("sapfront_tx",2,"a")' 错误登录 Error
+  Set objBiz = Nothing
+
+
+  结果：登录2条 1 的数据
+  结论：事物分别起作用 ，虽然是一个对象，也是建立了两个事务，第二个调用NG，并没回滚第一个
+
+
+ケース3：
+  Dim objBiz
+  Set objBiz = CreateObject("SAPFRONTCOM0001.ResultHistoryManage")
+  Call objBiz.InsertTest("sapfront_tx",1,"a")
+  Set objBiz = Nothing
+  结果：登录2条 1 的数据
+  结论：事物起作用 ，第一个SQL 因为 第二个SQL错误回滚了
+

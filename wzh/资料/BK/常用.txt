@@ -1,0 +1,32 @@
+sel_row_enable:fals
+ms_row_enable:false
+ins_row_enable:fals
+var scLeft = that.divBodyEle.scrollLeft();
+var scTop = that.divBodyEle.scrollTop();
+
+9006160965/CHADDLW3A1BTAXX/2/3/4
+
+XXXXXXXXXXXCCCCC Y7210611/C
+
+
+CHADDLW3A1BTAXX
+9006160965	9006160969
+CHADDLW3AABXAXR	9006662036	28-2-84
+CHADDLW3AAAXAJR	9006772896	13-2-118
+
+DESKTOP-EFF0Q9F
+DESKTOP-EFF0Q9F\YW-J27S 
+
+默认
+
+info["url"]
+info["state"]	SUCCESS
+info["originalName"]
+
+D:\GITEE\wzh-and-zx\wzh\zyUpload\web\Image\ChkImgs\051.jpg
+D:\GITEE\wzh-and-zx\wzh\web\Image\ChkImgs
+D:\GITEE\wzh-and-zx\wzh\zyUpload\web\Image\ChkImgs\
+new System.Collections.Hashtable.HashtableDebugView(info).Items[3]
+imgLook" runat="server" CssClass="JQ_IMG" ImageUrl="~/Image/wait.gif"
+
+負荷テストについて、想定最大のアクセス数はどのぐらいですか？

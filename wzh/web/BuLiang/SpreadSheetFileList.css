@@ -1,0 +1,41 @@
+﻿#file-list {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #f2f2f2;
+    /*放置的位置设置*/
+    position: fixed; /*1、【relative】相对定位；2、【absolute】绝对定位；3、【fixed】固定定位；4、【static】默认值；5、【sticky】粘性定位。*/
+    left: 8%; /*定位：离页面左边0px的位置*/
+    width: 84%;
+    height: 80%;
+    bottom: 100px; /*定位：离页面底部0px的位置*/
+    border: 1px solid #000;
+    border-radius: 6px;
+    font-size: 9px;
+    z-index: 9999999;
+}
+
+    #file-list ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    #file-list li {
+        padding: 5px;
+        cursor: pointer;
+        border-bottom: 1px solid #ccc;
+    }
+
+        #file-list li:last-child {
+            border-bottom: none;
+        }
+
+        #file-list li:hover {
+            background-color: #e6e6e6;
+        }
+
+
+        #aa{
+            background-color:#455d76
+        }

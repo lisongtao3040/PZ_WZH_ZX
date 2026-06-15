@@ -1,0 +1,81 @@
+COMトランザクション動作分析まとめ
+
+＝＝＝ 調査対象環境 ＝＝＝
+・呼び出し元：ASPページ
+・中間層：SAPFRONTCOM0001.cls（MTSTransactionMode = 2）
+・データアクセス層：COMDBUtil.CDBAccess（MTSTransactionMode = 3）
+
+＝＝＝ 各種ケース分析 ＝＝＝
+
+【ケース1：複数プログラムによる同時呼び出し】
+コード例：
+  プログラムA：CreateObject("COMDBUtil.CDBAccess") → INSERT SQL
+  プログラムB：CreateObject("COMDBUtil.CDBAccess") → INSERT SQL
+
+判断結果：複数の独立トランザクション
+理由：
+  ・各プログラムは独立したCOM+クライアント
+  ・各プログラムのMTSTransactionMode=2がそれぞれ独立トランザクションを作成
+  ・異なるプログラム間でトランザクションコンテキストは共有されない
+
+【ケース2：単一プログラム内でのループ呼び出し（オブジェクト再作成）】
+コード例：
+  For i = 1 To N
+      Dim objCDBAccess
+      Set objCDBAccess = CreateObject("COMDBUtil.CDBAccess")
+      objCDBAccess.ExecuteSql "INSERT ..."
+  Next
+
+判断結果：N個の独立トランザクション
+理由：
+  ・各CreateObject呼び出しで新しいCOMオブジェクトインスタンスを作成
+  ・各インスタンスのメソッド呼び出しが独立トランザクションで実行
+  ・ASPは複数メソッド呼び出しにまたがるトランザクションコンテキストを維持できない
+
+【ケース3：単一プログラム内でのループ呼び出し（同一オブジェクト）】
+コード例：
+  Set obj = CreateObject("COMDBUtil.CDBAccess")
+  For i = 1 To N
+      obj.ExecuteSql "INSERT ..."
+  Next
+
+判断結果：N個の独立トランザクション
+理由：
+  ・同一オブジェクトインスタンスでも、各メソッド呼び出しは独立
+  ・COM+トランザクション境界はメソッド呼び出しレベル
+  ・ASPがトランザクションコンテキストを提供しないため、各呼び出しで新規トランザクション作成
+
+【ケース4：ASP → SAPFRONTCOM0001.cls → COMDBUtil.CDBAccess の呼び出し連鎖】
+コード例：
+  Set obj = Server.CreateObject("SAPFRONTCOM0001.cls")
+  For i = 1 To N
+      obj.InsertJson(jsonData)
+  Next
+
+判断結果：N個の独立トランザクション
+理由：
+  ・ASPはCOM+トランザクションコンテキストを持たない
+  ・SAPFRONTCOM0001.clsのInsertJson（MTSTransactionMode=2）が各呼び出しで新規トランザクション作成
+  ・COMDBUtil.CDBAccessは呼び出し元のトランザクションに参加
+
+＝＝＝ 総合結論 ＝＝＝
+
+1. 現在のCOMトランザクション設計では、複数のデータベース操作を単一トランザクションで実行できない
+2. トランザクション境界はメソッド呼び出しレベルで決定される
+3. ASPからの呼び出しでは、呼び出し回数分の独立トランザクションが作成される
+4. ビジネスロジックの原子性を保証するには、コンポーネント内部でバッチ処理を実装する必要がある
+
+＝＝＝ 推奨改善案 ＝＝＝
+
+・単一トランザクションで複数操作を実行する場合：
+  - コンポーネント側でバッチ処理メソッドを追加
+  - または、分散トランザクションコーディネータを明示的に使用
+  - または、呼び出し元でCOM+トランザクションコンテキストを明示的に作成
+
+・現在の設計のメリット：
+  - 障害分離：個別の操作失敗が全体に影響しない
+  - エラー処理の簡素化
+
+・現在の設計のデメリット：
+  - ビジネスロジックの原子性が保証されない
+  - トランザクションオーバーヘッドが大きい（N回のトランザクションコミットコスト）

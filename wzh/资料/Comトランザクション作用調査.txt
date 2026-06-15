@@ -1,0 +1,61 @@
+結論：
+- 各メソッド呼び出しは独立したCOM+メソッド呼び出しである
+- COM+トランザクション境界はメソッド呼び出しレベルであり、オブジェクトインスタンスレベルではない
+- ASPは複数のメソッド呼び出しにまたがるトランザクションコンテキストを作成または維持する能力がない
+- 各InsertJson呼び出しは独立して自身のトランザクションを作成し終了する
+
+つまり、私が言ったように、現在のCOMトランザクションには全体としての効果はない。
+
+検証：
+COM：SQL
+    strSQL = ""
+    strSQL = strSQL & "INSERT INTO test "
+    strSQL = strSQL & "   ( "
+    strSQL = strSQL & "     a1 "
+    strSQL = strSQL & "   ) "
+    strSQL = strSQL & " VALUES "
+    strSQL = strSQL & "   ( "
+    strSQL = strSQL & "     ? "
+    strSQL = strSQL & "   ) "
+    
+    strSQL = strSQL & "INSERT INTO test "
+    strSQL = strSQL & "   ( "
+    strSQL = strSQL & "     a1 "
+    strSQL = strSQL & "   ) "
+    strSQL = strSQL & " VALUES "
+    strSQL = strSQL & "   ( "
+    strSQL = strSQL & "     ? "
+    strSQL = strSQL & "   ) "
+
+    1回の呼び出しで2件登録
+
+ケース１：
+  Dim objBiz
+  Set objBiz = CreateObject("SAPFRONTCOM0001.ResultHistoryManage")
+  Call objBiz.InsertTest("sapfront_tx",1,1)
+  Set objBiz = Nothing
+
+  
+  Set objBiz2 = CreateObject("SAPFRONTCOM0001.ResultHistoryManage")
+  Call objBiz2.InsertTest("sapfront_tx",2,"a")' エラー登録 Error
+  Set objBiz2 = Nothing
+  結果：2件のデータ1が登録される
+  結論：トランザクションはそれぞれ別々に作用し、2回目の呼び出しがNGでも1回目はロールバックされない
+
+ケース2：
+  Dim objBiz
+  Set objBiz = CreateObject("SAPFRONTCOM0001.ResultHistoryManage")
+  Call objBiz.InsertTest("sapfront_tx",1,1)
+  Call objBiz2.InsertTest("sapfront_tx",2,"a")' エラー登録 Error
+  Set objBiz = Nothing
+
+  結果：2件のデータ1が登録される
+  結論：トランザクションはそれぞれ別々に作用し、同じオブジェクトでも2つのトランザクションが確立され、2回目の呼び出しがNGでも1回目はロールバックされない
+
+ケース3：
+  Dim objBiz
+  Set objBiz = CreateObject("SAPFRONTCOM0001.ResultHistoryManage")
+  Call objBiz.InsertTest("sapfront_tx",1,"a")
+  Set objBiz = Nothing
+  結果：2件のデータ1が登録される
+  結論：トランザクションが作用し、1つ目のSQLは2つ目のSQLのエラーによりロールバックされた

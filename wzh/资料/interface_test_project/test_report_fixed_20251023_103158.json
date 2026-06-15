@@ -1,0 +1,93 @@
+{
+  "test_timestamp": "2025-10-23 10:31:58",
+  "test_url": "http://tes-crasflt.intra.lixil.co.jp/train/sapfront/train/scripts/PrefabTokuchujuchutoroku.asp",
+  "monitor_url": "http://lxjtddsap177.lixil.lan/train/common/scripts/trainmonitor.asp",
+  "test_data": {
+    "InterfaceRequestNumber": "XXXXXXXX",
+    "UpdateBy": "1234567890123456",
+    "SalesVoucherType": "UN",
+    "DeliverySegment": "1",
+    "CustomerCd": "201694",
+    "PropertyNo": "",
+    "Continuation": "",
+    "SiteName": "新規",
+    "OrderNo": "2233",
+    "DeliveryNoteRemarks": "",
+    "DeliveryNoteSegment": "",
+    "DeliveryExpectDate": "",
+    "CustomerOrderNo": "",
+    "TaxDivision": "",
+    "ShipmentDestinationCd": "127223",
+    "ShipmentSegment": "51",
+    "DepartmentCd": "JTX7",
+    "AllocationDestination": "",
+    "List": [
+      {
+        "RepresentativeCd": "TAALG3G16FL3G",
+        "Quantity": "10",
+        "UnitPrice": "1000",
+        "BusinessDivision": "100",
+        "ItemSummary": "1222",
+        "Symbol1": "HG",
+        "Dimension1": "1000",
+        "Symbol2": "WG",
+        "Dimension2": "500",
+        "Symbol3": "",
+        "Dimension3": "",
+        "Symbol4": "",
+        "Dimension4": "",
+        "Symbol5": "",
+        "Dimension5": "",
+        "Symbol6": "",
+        "Dimension6": "",
+        "ApprovalNoOutOfLimit": "",
+        "CustomerCd": "テスト新規",
+        "Row": 1
+      }
+    ]
+  },
+  "expected_result": {
+    "intRcd": 0,
+    "strMsg": "正常終了",
+    "PropertyNo": ""
+  },
+  "actual_result": {
+    "success": false,
+    "error": "HTTP错误: 500",
+    "status_code": 500,
+    "raw_response": " <font size=2>\n<p>Microsoft VBScript ÀsG[</font> <font size=2>G[ '800a221c'</font>\n<p>\n<font size=2>No JSON object could be ScanOnced</font>\n<p>\n<font size=2>/train/sapfront/include/JsonParser.asp</font><font size=2>, s 143</font> "
+  },
+  "monitor_results": [
+    {
+      "timestamp": "2025-10-23 10:31:49",
+      "status_code": 200,
+      "content_length": 4094,
+      "check_count": 1
+    },
+    {
+      "timestamp": "2025-10-23 10:31:51",
+      "status_code": 200,
+      "content_length": 4094,
+      "check_count": 2
+    },
+    {
+      "timestamp": "2025-10-23 10:31:54",
+      "status_code": 200,
+      "content_length": 4094,
+      "check_count": 3
+    },
+    {
+      "timestamp": "2025-10-23 10:31:56",
+      "status_code": 200,
+      "content_length": 4094,
+      "check_count": 4
+    }
+  ],
+  "summary": {
+    "test_passed": false,
+    "error": "HTTP错误: 500",
+    "monitor_checks": 4,
+    "successful_monitor_checks": 4,
+    "failed_monitor_checks": 0
+  }
+}

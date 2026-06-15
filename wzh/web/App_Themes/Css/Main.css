@@ -1,0 +1,234 @@
+﻿@font-face {
+    /*font-family: JetBrainsMono-Regular;
+    src: url('./Font/JetBrainsMono-Regular.ttf') format('embedded-opentype'), url('./Font/JetBrainsMono-Regular.ttf') format('woff'), url(./Font/JetBrainsMono-Regular.woff2);*/
+    font-family: JetBrainsMono-ExtraBold;
+    src: url(./Font/JetBrainsMono-ExtraBold.woff2);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    height: 100%;
+    font-family: JetBrainsMono-ExtraBold,Meiryo, sans-serif;
+    background-color: #efefef;
+    /* font-family: JetBrainsMono-ExtraBold;*/
+}
+
+form {
+    height: 100%;
+}
+
+header {
+    width: 100%;
+    min-width: 800px;
+    height: 60px;
+    background-color: #b4bece;
+    color: #333;
+    position: fixed;
+    z-index: 999;
+}
+
+article {
+    position: fixed;
+    top: 60px;
+    bottom: 30px;
+    width: 100%;
+    overflow: auto;
+}
+
+footer {
+    text-align: center;
+    width: 100%;
+    min-width: 800px;
+    height: 30px;
+    color: #000;
+    background-color: #b4bece;
+    position: fixed;
+    bottom: 0px;
+}
+
+@keyframes input_focus {
+    from {
+        background-color: #fff;
+    }
+
+    to {
+        background-color: #c2dbd0;
+    }
+}
+
+input[type="text"], input[type="password"] {
+    height: 40px;
+    font-size: 30px;
+    padding-left: 5px;
+}
+
+    input[type="text"]:focus, input[type="password"]:focus {
+        background-color: #c2dbd0;
+        border-radius: 5px;
+        animation-name: input_focus;
+        animation-duration: 0.25s;
+    }
+
+    input[type="text"]::selection, input[type="password"]::selection {
+        background-color: #095074;
+        color: #fff;
+    }
+
+
+@keyframes button_hover {
+    from {
+        background-color: #fff;
+    }
+
+    to {
+        background-color: blue;
+    }
+}
+
+
+input[type="submit"], input[type="button"], input[type="reset"] {
+    font-size: 30px;
+    font-weight: bold;
+}
+
+    /*不好用**/
+    input[type="submit"]:hover, input[type="button"]:hover, input[type="reset"]:hover, input[type="submit"]:focus, input[type="button"]:focus, input[type="reset"]:focus {
+        background-color: blue;
+        color: #fff;
+        border-radius: 5px;
+        animation-name: button_hover;
+        animation-duration: 0.25s;
+    }
+
+
+    .gv td{
+        text-align:center;
+        font-weight:bold;
+        word-break:break-all;
+    }
+
+
+
+/* 整体对话框*/
+.ui-dialog {
+    background-color: #fff;
+    opacity: 0.97;
+}
+/*包含对话框标题和关闭按钮的标题栏。*/
+.ui-dialog-titlebar {
+    font-size: 30px;
+    margin: 0 auto 0 auto;
+}
+
+/**标题文字*/
+.ui-dialog-title {
+    color: red;
+}
+
+.ui-dialog-content {
+    width: 500px;
+    color: red;
+    font-size: 26px;
+    font-weight: bold;
+    border: 10px;
+}
+
+.ui-dialog-titlebar-close {
+    display: none;
+}
+
+.ui-dialog-buttonpane {
+    margin: 0 auto 0 auto;
+}
+
+.ui-dialog-buttonset {
+    /*width:500px;*/
+    /*background-color:red;*/
+    width: 100%;
+}
+
+    .ui-dialog-buttonset button {
+        font-size: 30px;
+        margin: 0 auto 0 auto;
+        width: 100%;
+        height: 50px;
+    }
+
+
+/**明显控件用*/
+/*.jq_ms td, .jq_ms th, .jq_title th {
+    padding: 1px 4px 1px 4px;
+}*/
+
+.MsPanel td, .MsPanel th {
+    padding: 2px 4px 2px 4px;
+    font-family: 'Microsoft YaHei',Tahoma,Helvetica,Arial,"\5b8b\4f53",sans-serif;
+    font-size: 12px;
+    font-weight: normal;
+    
+}
+
+.MsPanel input{
+    font-size:12px;
+    height:20px;
+    font-weight:normal;
+}
+
+.MsPanel th {
+    background-color: #b4bece;
+}
+
+.jqCntPanel {
+    font-family:Helvetica,Arial,"\5b8b\4f53",sans-serif;
+    font-size: 12px;
+     
+    padding:6px 4px 6px 4px;
+    margin-top:4px;
+    background-color:#f8f8f8;
+    border-radius:6px;
+}
+
+    .jqCntPanel a {
+        margin-left: 6px;
+    }
+
+
+.page_sou_a {
+    padding-left: 20px;
+}
+
+
+.iptbox{
+    position:fixed;
+    z-index:99999999;
+    width:400px;
+}
+.iptListBox{
+    /*position:fixed;*/
+    /*z-index:99999999;*/
+
+}
+
+
+
+.cell_key{
+    color:blue;
+}
+.upd{
+    background-color:#efefef;
+}
+.listbox{
+    background-color:#ffd800;
+}
+.jq_ms input{
+    margin:0px 4px 0px 4px;
+}
+

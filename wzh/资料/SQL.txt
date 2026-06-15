@@ -1,0 +1,1571 @@
+-- 既存当日と3ヵ月前のSAPデータテーブルのデータを削除する
+DELETE
+FROM
+`an1_SAP_LHT2nd.MC_SAP_DATA`
+WHERE
+TIMESTAMP = PARSE_DATE('%Y%m%d','{PROCESS_DATE}')
+OR TIMESTAMP <= DATE_SUB(PARSE_DATE('%Y%m%d','{PROCESS_DATE}'), INTERVAL 4 MONTH)
+;
+
+
+-- 当日のSAPデータを登録する：入庫（日計）
+INSERT INTO `an1_SAP_LHT2nd.MC_SAP_DATA` (
+WERKS,
+PRDHA,
+ZZ_MATNMCD,
+MATNR,
+RECEIPT_DAY1,
+RECEIPT_DAY2,
+RECEIPT_DAY3,
+RECEIPT_DAY4,
+RECEIPT_DAY5,
+RECEIPT_DAY6,
+RECEIPT_DAY,
+TIMESTAMP
+)
+-- 借方/貸方フラグ S
+WITH RECEIPT_DAY_WK AS (
+    SELECT
+    DISTINCT A.MBLNR AS MBLNR,         -- 入出庫伝票番号
+    FROM
+    `an1_SAP_LHT2nd.MATDOC` A          -- 入出庫伝票(明細データ)
+    WHERE
+    A.BWART = '641'                    -- 移動タイプ (在庫管理)
+    AND A.SHKZG = 'S'                  -- 借方/貸方フラグ
+    AND (
+        A.WERKS='10J0' 
+        OR EXISTS (
+            SELECT
+            1
+            FROM
+            `an1_SAP_LHT2nd.CONVERSION_MAPPING` D
+            WHERE
+            A.WERKS = D.WERKS
+        )
+    )
+)
+-- 入庫データの取得：パターン1
+,RECEIPT_DAY_01 AS (
+    SELECT
+    A.WERKS AS WERKS,                  -- プラント
+    A.MATNR AS MATNR,                  -- 品目コード
+    SUM(A.MENGE) AS RECEIPT_DAY1       -- 数量1
+    FROM
+    `an1_SAP_LHT2nd.MATDOC` A          -- 入出庫伝票(明細データ)
+    INNER JOIN
+    `an1_SAP_LHT2nd.CONVERSION_MAPPING` B
+    ON A.WERKS = B.WERKS
+    INNER JOIN
+    `an1_SAP_LHT2nd.EKKO` C            -- 購買伝票ヘッダ
+    ON A.EBELN = C.EBELN               -- 購買伝票番号
+    WHERE
+    A.BWART = '101'                    -- 移動タイプ (購買発注入庫)
+    AND NOT EXISTS (
+        SELECT
+        1
+        FROM
+        `an1_SAP_LHT2nd.CONVERSION_MAPPING` D
+        WHERE
+        C.RESWK = D.WERKS
+    )
+    AND C.RESWK <> '10J0'              -- 在庫転送オーダーにおける供給 (出庫) プラント
+    AND FORMAT_TIMESTAMP('%Y%m%d', A.CPUDT) = FORMAT_DATE('%Y%m%d', PARSE_DATE('%Y%m%d','{PROCESS_DATE}')) -- 会計伝票登録日付
+    GROUP BY
+    A.WERKS,
+    A.MATNR
+)
+-- 入庫データの取得：パターン2
+,RECEIPT_DAY_02 AS (
+    SELECT
+    A.WERKS AS WERKS,                  -- プラント
+    A.MATNR AS MATNR,                  -- 品目コード
+    SUM(A.MENGE) AS RECEIPT_DAY2       -- 数量2
+    FROM
+    `an1_SAP_LHT2nd.MATDOC` A          -- 入出庫伝票(明細データ)
+    INNER JOIN
+    `an1_SAP_LHT2nd.CONVERSION_MAPPING` B
+    ON
+    A.WERKS = B.WERKS
+    LEFT JOIN
+    RECEIPT_DAY_WK C
+    ON
+    A.MBLNR = C.MBLNR                  -- 入出庫伝票番号
+    WHERE
+    A.BWART = '641'                    -- 移動タイプ (転送出庫確認)
+    AND A.SHKZG = 'H'                  -- 借方/貸方フラグ
+    AND C.MBLNR IS NULL                -- 入出庫伝票番号
+    AND FORMAT_TIMESTAMP('%Y%m%d',A.CPUDT) = FORMAT_DATE('%Y%m%d', PARSE_DATE('%Y%m%d','{PROCESS_DATE}')) -- 入出庫伝票番号
+    GROUP BY
+    A.WERKS,
+    A.MATNR
+)
+-- 入庫データの取得：パターン3
+-- 工場から在庫転送の正流(BWART = Z77 and SGTXT like 'I02' and REMARK_1 = '01'(WERKS) and REMARK_2 = '02'(UMWRK) and RECORD_TYPE= MDOC and XAUTO != 'X')
+,RECEIPT_DAY_03 AS (
+    SELECT
+    A.UMWRK AS WERKS,                  -- プラント
+    A.MATNR AS MATNR,                  -- 品目コード
+    SUM(A.MENGE) AS RECEIPT_DAY3       -- 数量3
+    FROM
+    `an1_SAP_LHT2nd.MATDOC` A          -- 入出庫伝票(明細データ)
+    INNER JOIN
+    `lixil-datahub-qas.SAP_CFIN.T001W` AS C1 -- プラントマスタ
+    ON A.WERKS = C1.WERKS
+    INNER JOIN
+    `an1_SAP_CFIN.ADRCT` AS D1         -- 住所テキストマスタ
+    ON  C1.ADRNR = D1.ADDRNUMBER
+    INNER JOIN
+    `lixil-datahub-qas.SAP_CFIN.T001W` AS C2 -- プラントマスタ
+    ON A.UMWRK = C2.WERKS
+    INNER JOIN
+    `an1_SAP_CFIN.ADRCT` AS D2         -- 住所テキストマスタ
+    ON  C2.ADRNR = D2.ADDRNUMBER
+    WHERE
+    A.BWART = 'Z77'                    -- 移動タイプ (Z77:転送出庫(STO)、Z79:転送入庫(STO))
+    AND D1.REMARK = '01'               -- 住所注記(プラント：工場)
+    AND D2.REMARK = '02'               -- 住所注記(入庫プラント：物流)
+    AND A.SGTXT LIKE 'I02%'
+    AND A.RECORD_TYPE= 'MDOC'          -- レコードタイプ
+    AND A.XAUTO != 'X'                 -- 自動登録済み明細
+    AND FORMAT_TIMESTAMP('%Y%m%d', A.CPUDT) = FORMAT_DATE('%Y%m%d', PARSE_DATE('%Y%m%d','{PROCESS_DATE}'))
+    GROUP BY
+    A.UMWRK,
+    A.MATNR
+)
+-- 入庫データの取得：パターン4
+-- 工場から在庫転送の逆流(BWART = Z77 and SGTXT like 'I07' and REMARK_1 = '02'(WERKS) and REMARK_2 = '01'(UMWRK) and RECORD_TYPE= MDOC and XAUTO != 'X')
+,RECEIPT_DAY_04 AS (
+    SELECT
+    A.UMWRK AS WERKS,                  -- プラント
+    A.MATNR AS MATNR,                  -- 品目コード
+    SUM(-1 * A.MENGE) AS RECEIPT_DAY4  -- 数量4
+    FROM
+    `an1_SAP_LHT2nd.MATDOC` A          -- 入出庫伝票(明細データ)
+    INNER JOIN
+    `lixil-datahub-qas.SAP_CFIN.T001W` AS C1 -- プラントマスタ
+    ON A.WERKS = C1.WERKS
+    INNER JOIN
+    `an1_SAP_CFIN.ADRCT` AS D1         -- 住所テキストマスタ
+    ON  C1.ADRNR = D1.ADDRNUMBER
+    INNER JOIN
+    `lixil-datahub-qas.SAP_CFIN.T001W` AS C2 -- プラントマスタ
+    ON A.UMWRK = C2.WERKS
+    INNER JOIN
+    `an1_SAP_CFIN.ADRCT` AS D2         -- 住所テキストマスタ
+    ON  C2.ADRNR = D2.ADDRNUMBER
+    WHERE
+    A.BWART = 'Z77'                    -- 移動タイプ (Z77:転送出庫(STO)、Z79:転送入庫(STO))
+    AND D1.REMARK = '02'               -- 住所注記(プラント：物流)
+    AND D2.REMARK = '01'               -- 住所注記(入庫プラント：工場)
+    AND A.SGTXT LIKE 'I07%'
+    AND A.RECORD_TYPE= 'MDOC'          -- レコードタイプ
+    AND A.XAUTO != 'X'                 -- 自動登録済み明細
+    AND FORMAT_TIMESTAMP('%Y%m%d', A.CPUDT) = FORMAT_DATE('%Y%m%d', PARSE_DATE('%Y%m%d','{PROCESS_DATE}'))
+    GROUP BY
+    A.UMWRK,
+    A.MATNR
+)
+-- 入庫データの取得：パターン5
+-- 工場以外から在庫転送の正流(BWART = 'ZD2' and REMARK_1 ='01'(substr(KOSTL,5,4)) and REMARK_2(WERKS) ='02' and SGTXT like 'U09%')
+,RECEIPT_DAY_05 AS (
+    SELECT
+    A.WERKS AS WERKS,                  -- プラント
+    A.MATNR AS MATNR,                  -- 品目コード
+    SUM(A.MENGE) AS RECEIPT_DAY5       -- 数量5
+    FROM
+    `an1_SAP_LHT2nd.MATDOC` A -- 入出庫伝票(明細データ)
+    INNER JOIN
+    `an1_SAP_LHT2nd.PLANT_MAPPING` AS B
+    ON SUBSTR(A.KOSTL, 5, 4) = B.jigyou_cd
+    INNER JOIN
+    `lixil-datahub-qas.SAP_CFIN.T001W` AS C1 -- プラントマスタ
+    ON B.PLANT = C1.WERKS
+    INNER JOIN
+    `an1_SAP_CFIN.ADRCT` AS D1 -- 住所テキストマスタ
+    ON  C1.ADRNR = D1.ADDRNUMBER
+    INNER JOIN
+    `lixil-datahub-qas.SAP_CFIN.T001W` AS C2 -- プラントマスタ
+    ON A.WERKS = C2.WERKS
+    INNER JOIN
+    `an1_SAP_CFIN.ADRCT` AS D2 -- 住所テキストマスタ
+    ON  C2.ADRNR = D2.ADDRNUMBER
+    WHERE
+    A.BWART = 'ZD2'                      -- 移動タイプ (ZD1:転送出庫、ZD2:転送入庫)
+    AND D1.REMARK = '01'                 -- 住所注記(原価センタ：工場)
+    AND D2.REMARK = '02'                 -- 住所注記(プラント：物流)
+    AND A.SGTXT LIKE 'U09%'
+    -- AND A.RECORD_TYPE= 'MDOC'            -- レコードタイプ
+    -- AND A.XAUTO != 'X'                   -- 自動登録済み明細
+    AND FORMAT_TIMESTAMP('%Y%m%d', A.CPUDT) = FORMAT_DATE('%Y%m%d', PARSE_DATE('%Y%m%d','{PROCESS_DATE}'))
+    GROUP BY
+    A.WERKS,
+    A.MATNR
+)
+-- 入庫データの取得：パターン6
+-- 工場以外から在庫転送の逆流⇒数量マイナス(BWART = 'ZD1' and REMARK_1(WERKS) ='02' and REMARK_2(substr(KOSTL,5,4)) ='01'  and SGTXT like 'U10%')
+,RECEIPT_DAY_06 AS (
+    SELECT
+    A.WERKS AS WERKS,                  -- プラント
+    A.MATNR AS MATNR,                  -- 品目コード
+    SUM(-1 * A.MENGE) AS RECEIPT_DAY6  -- 数量6
+    FROM
+    `an1_SAP_LHT2nd.MATDOC` A -- 入出庫伝票(明細データ)
+    INNER JOIN
+    `lixil-datahub-qas.SAP_CFIN.T001W` AS C1 -- プラントマスタ
+    ON A.WERKS = C1.WERKS
+    INNER JOIN
+    `an1_SAP_CFIN.ADRCT` AS D1 -- 住所テキストマスタ
+    ON  C1.ADRNR = D1.ADDRNUMBER
+    INNER JOIN
+    `an1_SAP_LHT2nd.PLANT_MAPPING` AS B
+    ON SUBSTR(A.KOSTL, 5, 4) = B.jigyou_cd
+    INNER JOIN
+    `lixil-datahub-qas.SAP_CFIN.T001W` AS C2 -- プラントマスタ
+    ON B.PLANT = C2.WERKS
+    INNER JOIN
+    `an1_SAP_CFIN.ADRCT` AS D2 -- 住所テキストマスタ
+    ON  C2.ADRNR = D2.ADDRNUMBER
+    WHERE
+    A.BWART = 'ZD1'                      -- 移動タイプ (ZD1:転送出庫、ZD2:転送入庫)
+    AND D1.REMARK = '02'                 -- 住所注記(プラント：物流)
+    AND D2.REMARK = '01'                 -- 住所注記(原価センタ：工場)
+    AND A.SGTXT LIKE 'U10%'
+    -- AND A.RECORD_TYPE= 'MDOC'            -- レコードタイプ
+    -- AND A.XAUTO != 'X'                   -- 自動登録済み明細
+    AND FORMAT_TIMESTAMP('%Y%m%d', A.CPUDT) = FORMAT_DATE('%Y%m%d', PARSE_DATE('%Y%m%d','{PROCESS_DATE}'))
+    GROUP BY
+    A.WERKS,
+    A.MATNR
+)
+-- 入庫日計
+,RECEIPT_DAY_W01 AS (
+    SELECT
+    A1.WERKS AS WERKS,                                          -- プラント
+    A1.MATNR AS MATNR,                                          -- 品目コード
+    SUM(A1.RECEIPT_DAY1) AS RECEIPT_DAY1,                       -- 入庫日計数量1
+    SUM(-1 * A1.RECEIPT_DAY2) AS RECEIPT_DAY2,                  -- 入庫日計数量2
+    SUM(A1.RECEIPT_DAY3) AS RECEIPT_DAY3,                       -- 入庫日計数量3
+    SUM(-1 * A1.RECEIPT_DAY4) AS RECEIPT_DAY4,                  -- 入庫日計数量4
+    SUM(A1.RECEIPT_DAY5) AS RECEIPT_DAY5,                       -- 入庫日計数量5
+    SUM(-1 * A1.RECEIPT_DAY6) AS RECEIPT_DAY6,                  -- 入庫日計数量6
+    (SUM(A1.RECEIPT_DAY1) - SUM(A1.RECEIPT_DAY2) 
+    + SUM(A1.RECEIPT_DAY3) - SUM(A1.RECEIPT_DAY4) 
+    + SUM(A1.RECEIPT_DAY5) - SUM(A1.RECEIPT_DAY6)
+    ) AS RECEIPT_DAY                                            -- 日計入庫数量
+    FROM (
+        SELECT
+        WERKS,                                                  -- プラント
+        MATNR,                                                  -- 品目コード
+        RECEIPT_DAY1,                                           -- 入庫日計数量1
+        0 AS RECEIPT_DAY2,                                      -- 入庫日計数量2
+        0 AS RECEIPT_DAY3,                                      -- 入庫日計数量3
+        0 AS RECEIPT_DAY4,                                      -- 入庫日計数量4
+        0 AS RECEIPT_DAY5,                                      -- 入庫日計数量5
+        0 AS RECEIPT_DAY6                                       -- 入庫日計数量6
+        FROM
+        RECEIPT_DAY_01
+        UNION ALL
+        SELECT
+        WERKS,                                                  -- プラント
+        MATNR,                                                  -- 品目コード
+        0 AS RECEIPT_DAY1,                                      -- 入庫日計数量1
+        RECEIPT_DAY2,                                           -- 入庫日計数量2
+        0 AS RECEIPT_DAY3,                                      -- 入庫日計数量3
+        0 AS RECEIPT_DAY4,                                      -- 入庫日計数量4
+        0 AS RECEIPT_DAY5,                                      -- 入庫日計数量5
+        0 AS RECEIPT_DAY6                                       -- 入庫日計数量6
+        FROM
+        RECEIPT_DAY_02
+        UNION ALL
+        SELECT
+        WERKS,                                                  -- プラント
+        MATNR,                                                  -- 品目コード
+        0 AS RECEIPT_DAY1,                                      -- 入庫日計数量1
+        0 AS RECEIPT_DAY2,                                      -- 入庫日計数量2
+        RECEIPT_DAY3,                                           -- 入庫日計数量3
+        0 AS RECEIPT_DAY4,                                      -- 入庫日計数量4
+        0 AS RECEIPT_DAY5,                                      -- 入庫日計数量5
+        0 AS RECEIPT_DAY6                                       -- 入庫日計数量6
+        FROM
+        RECEIPT_DAY_03
+        UNION ALL
+        SELECT
+        WERKS,                                                  -- プラント
+        MATNR,                                                  -- 品目コード
+        0 AS RECEIPT_DAY1,                                      -- 入庫日計数量1
+        0 AS RECEIPT_DAY2,                                      -- 入庫日計数量2
+        0 AS RECEIPT_DAY3,                                      -- 入庫日計数量3
+        RECEIPT_DAY4,                                           -- 入庫日計数量4
+        0 AS RECEIPT_DAY5,                                      -- 入庫日計数量5
+        0 AS RECEIPT_DAY6                                       -- 入庫日計数量6
+        FROM
+        RECEIPT_DAY_04
+        UNION ALL
+        SELECT
+        WERKS,                                                  -- プラント
+        MATNR,                                                  -- 品目コード
+        0 AS RECEIPT_DAY1,                                      -- 入庫日計数量1
+        0 AS RECEIPT_DAY2,                                      -- 入庫日計数量2
+        0 AS RECEIPT_DAY3,                                      -- 入庫日計数量3
+        0 AS RECEIPT_DAY4,                                      -- 入庫日計数量4
+        RECEIPT_DAY5,                                           -- 入庫日計数量5
+        0 AS RECEIPT_DAY6                                       -- 入庫日計数量6
+        FROM
+        RECEIPT_DAY_05
+        UNION ALL
+        SELECT
+        WERKS,                                                  -- プラント
+        MATNR,                                                  -- 品目コード
+        0 AS RECEIPT_DAY1,                                      -- 入庫日計数量1
+        0 AS RECEIPT_DAY2,                                      -- 入庫日計数量2
+        0 AS RECEIPT_DAY3,                                      -- 入庫日計数量3
+        0 AS RECEIPT_DAY4,                                      -- 入庫日計数量4
+        0 AS RECEIPT_DAY5,                                      -- 入庫日計数量5
+        RECEIPT_DAY6                                            -- 入庫日計数量6
+        FROM
+        RECEIPT_DAY_06
+    ) A1
+    GROUP BY
+    A1.WERKS,
+    A1.MATNR
+)
+SELECT
+A1.WERKS,                                                       -- プラント
+IFNULL(A2.PRDHA, '') AS PRDHA,                                  -- 品目階層
+IFNULL(A2.ZZ_MATNMCD, '') AS ZZ_MATNMCD,                        -- 外部品目
+A1.MATNR,                                                       -- 品目
+SUM(A1.RECEIPT_DAY1) AS RECEIPT_DAY1,                           -- 入庫日計数量1
+SUM(A1.RECEIPT_DAY2) AS RECEIPT_DAY2,                           -- 入庫日計数量2
+SUM(A1.RECEIPT_DAY3) AS RECEIPT_DAY3,                           -- 入庫日計数量3
+SUM(A1.RECEIPT_DAY4) AS RECEIPT_DAY4,                           -- 入庫日計数量4
+SUM(A1.RECEIPT_DAY5) AS RECEIPT_DAY5,                           -- 入庫日計数量5
+SUM(A1.RECEIPT_DAY6) AS RECEIPT_DAY6,                           -- 入庫日計数量6
+SUM(A1.RECEIPT_DAY) AS RECEIPT_DAY,                             -- 入庫（日計）
+PARSE_DATE('%Y%m%d','{PROCESS_DATE}') AS TIMESTAMP              -- 日付
+FROM RECEIPT_DAY_W01 AS A1
+LEFT JOIN `an1_SAP_LHT2nd.MARA` A2
+ON A1.MATNR = A2.MATNR
+GROUP BY
+A1.WERKS,
+A1.MATNR,
+A2.PRDHA,
+A2.ZZ_MATNMCD
+;
+
+
+-- 当日のSAPデータを登録する：入庫（累計）
+INSERT INTO `an1_SAP_LHT2nd.MC_SAP_DATA` (
+WERKS,
+PRDHA,
+ZZ_MATNMCD,
+MATNR,
+RECEIPT_SUM,
+TIMESTAMP
+)
+SELECT
+A1.WERKS,                                                       -- プラント
+A1.PRDHA,                                                       -- 品目階層
+A1.ZZ_MATNMCD,                                                  -- 外部品目
+A1.MATNR,                                                       -- 品目
+SUM(A1.RECEIPT_DAY) AS RECEIPT_SUM,                             -- 入庫（累計）
+PARSE_DATE('%Y%m%d','{PROCESS_DATE}') AS TIMESTAMP              -- 日付
+FROM `an1_SAP_LHT2nd.MC_SAP_DATA` A1
+WHERE
+TIMESTAMP >= DATE_TRUNC(PARSE_DATE('%Y%m%d','{PROCESS_DATE}'), MONTH) -- 今月の月初
+AND TIMESTAMP <= PARSE_DATE('%Y%m%d','{PROCESS_DATE}')                -- 当日まで
+AND RECEIPT_DAY IS NOT NULL
+GROUP BY
+A1.WERKS,
+A1.PRDHA,
+A1.MATNR,
+A1.ZZ_MATNMCD
+;
+
+
+-- 当日のSAPデータを登録する：出庫（日計）
+INSERT INTO `an1_SAP_LHT2nd.MC_SAP_DATA` (
+WERKS,
+PRDHA,
+ZZ_MATNMCD,
+MATNR,
+ISSUE_DAY1,
+ISSUE_DAY2,
+ISSUE_DAY3,
+ISSUE_DAY4,
+ISSUE_DAY5,
+ISSUE_DAY6,
+ISSUE_DAY7,
+ISSUE_DAY8,
+ISSUE_DAY9,
+ISSUE_DAY10,
+ISSUE_DAY11,
+ISSUE_DAY,
+TIMESTAMP
+)
+-- 出庫日計
+WITH ISSUE_DAY_W01 AS (
+    SELECT
+    A1.WERKS AS WERKS,                         -- プラント
+    A1.MATNR AS MATNR,                         -- 品目コード
+    SUM(A1.ISSUE_DAY1) AS ISSUE_DAY1,          -- 出庫日計数量1
+    SUM(-1 * A1.ISSUE_DAY2) AS ISSUE_DAY2,     -- 出庫日計数量2
+    SUM(-1 * A1.ISSUE_DAY3) AS ISSUE_DAY3,     -- 出庫日計数量3
+    SUM(A1.ISSUE_DAY4) AS ISSUE_DAY4,          -- 出庫日計数量4
+    SUM(-1 * A1.ISSUE_DAY5) AS ISSUE_DAY5,     -- 出庫日計数量5
+    SUM(A1.ISSUE_DAY6) AS ISSUE_DAY6,          -- 出庫日計数量6
+    SUM(A1.ISSUE_DAY7) AS ISSUE_DAY7,          -- 出庫日計数量7
+    SUM(-1 * A1.ISSUE_DAY8) AS ISSUE_DAY8,     -- 出庫日計数量8
+    SUM(A1.ISSUE_DAY9) AS ISSUE_DAY9,          -- 出庫日計数量9
+    SUM(A1.ISSUE_DAY10) AS ISSUE_DAY10,        -- 出庫日計数量10
+    SUM(-1 * A1.ISSUE_DAY11) AS ISSUE_DAY11,   -- 出庫日計数量11
+    (SUM(A1.ISSUE_DAY1) - SUM(A1.ISSUE_DAY2) 
+    - SUM(A1.ISSUE_DAY3) + SUM(A1.ISSUE_DAY4) 
+    - SUM(A1.ISSUE_DAY5) + SUM(A1.ISSUE_DAY6)
+    + SUM(A1.ISSUE_DAY7) - SUM(A1.ISSUE_DAY8)
+    + SUM(A1.ISSUE_DAY9) + SUM(A1.ISSUE_DAY10) 
+    - SUM(A1.ISSUE_DAY11)) AS ISSUE_DAY        -- 日計出庫数量
+    FROM 
+    (
+        -- 出庫データの取得：パターン1
+        SELECT
+        A.WERKS AS WERKS,                     -- プラント
+        A.MATNR AS MATNR,                     -- 品目コード
+        SUM(A.MENGE) AS ISSUE_DAY1,          -- 数量1
+        0 AS ISSUE_DAY2,
+        0 AS ISSUE_DAY3,
+        0 AS ISSUE_DAY4,
+        0 AS ISSUE_DAY5,
+        0 AS ISSUE_DAY6,
+        0 AS ISSUE_DAY7,
+        0 AS ISSUE_DAY8,
+        0 AS ISSUE_DAY9,
+        0 AS ISSUE_DAY10,
+        0 AS ISSUE_DAY11
+        FROM
+        `an1_SAP_LHT2nd.MATDOC` A    -- 入出庫伝票(明細データ)
+        INNER JOIN
+        `an1_SAP_LHT2nd.CONVERSION_MAPPING` B
+        ON A.WERKS = B.WERKS
+        INNER JOIN
+        `lixil-datahub-qas.SAP_CFIN.T001W` AS C
+        ON A.WERKS = C.WERKS
+        INNER JOIN
+        `an1_SAP_CFIN.ADRCT` AS D
+        ON  C.ADRNR = D.ADDRNUMBER
+        AND D.REMARK = '02'                   -- 物流センター
+        WHERE
+        A.BWART = '601'                       -- 移動タイプ (出庫確認)
+        AND FORMAT_TIMESTAMP('%Y%m%d',A.CPUDT) = FORMAT_DATE('%Y%m%d', PARSE_DATE('%Y%m%d','{PROCESS_DATE}'))
+        GROUP BY
+        A.WERKS,
+        A.MATNR
+        -- 出庫データの取得：パターン2
+        UNION ALL
+        SELECT
+        A.WERKS AS WERKS,                     -- プラント
+        A.MATNR AS MATNR,                     -- 品目コード
+        0 AS ISSUE_DAY1,
+        SUM(A.MENGE) AS ISSUE_DAY2,          -- 数量2
+        0 AS ISSUE_DAY3,
+        0 AS ISSUE_DAY4,
+        0 AS ISSUE_DAY5,
+        0 AS ISSUE_DAY6,
+        0 AS ISSUE_DAY7,
+        0 AS ISSUE_DAY8,
+        0 AS ISSUE_DAY9,
+        0 AS ISSUE_DAY10,
+        0 AS ISSUE_DAY11
+        FROM
+        `an1_SAP_LHT2nd.MATDOC` A    -- 入出庫伝票(明細データ)
+        INNER JOIN
+        `an1_SAP_LHT2nd.CONVERSION_MAPPING` B
+        ON A.WERKS =B.WERKS
+        INNER JOIN
+        `lixil-datahub-qas.SAP_CFIN.T001W` AS C
+        ON A.WERKS = C.WERKS
+        INNER JOIN
+        `an1_SAP_CFIN.ADRCT` AS D
+        ON  C.ADRNR = D.ADDRNUMBER
+        AND D.REMARK = '02'                   -- 物流センター
+        WHERE
+        A.BWART ='653'                        -- 移動タイプ (受注返品 (利用可能）)
+        AND FORMAT_TIMESTAMP('%Y%m%d',A.CPUDT) = FORMAT_DATE('%Y%m%d', PARSE_DATE('%Y%m%d','{PROCESS_DATE}'))
+        GROUP BY
+        A.WERKS,
+        A.MATNR
+        -- 出庫データの取得：パターン3
+        UNION ALL
+        SELECT
+        A.WERKS AS WERKS,                     -- プラント
+        A.MATNR AS MATNR,                     -- 品目コード
+        0 AS ISSUE_DAY1,
+        0 AS ISSUE_DAY2,
+        SUM(A.MENGE) AS ISSUE_DAY3,         -- 数量3
+        0 AS ISSUE_DAY4,
+        0 AS ISSUE_DAY5,
+        0 AS ISSUE_DAY6,
+        0 AS ISSUE_DAY7,
+        0 AS ISSUE_DAY8,
+        0 AS ISSUE_DAY9,
+        0 AS ISSUE_DAY10,
+        0 AS ISSUE_DAY11
+        FROM
+        `an1_SAP_LHT2nd.MATDOC` A
+        INNER JOIN
+        `an1_SAP_LHT2nd.CONVERSION_MAPPING` B
+        ON A.WERKS = B.WERKS
+        INNER JOIN
+        `an1_SAP_LHT2nd.EKKO` C
+        ON A.EBELN = C.EBELN
+        WHERE
+        A.BWART = '101'                       -- 移動タイプ (購買発注入庫)
+        AND C.RESWK = '10J0'                  -- 在庫転送オーダーにおける供給 (出庫) プラント
+        AND FORMAT_TIMESTAMP('%Y%m%d',A.CPUDT) = FORMAT_DATE('%Y%m%d', PARSE_DATE('%Y%m%d','{PROCESS_DATE}'))
+        GROUP BY
+        A.WERKS,
+        A.MATNR
+        -- 出庫データの取得：パターン4
+        UNION ALL
+        SELECT
+        C.RESWK AS WERKS,                     -- 転送元プラント
+        A.MATNR AS MATNR,                     -- 品目コード
+        0 AS ISSUE_DAY1,
+        0 AS ISSUE_DAY2,
+        0 AS ISSUE_DAY3,
+        SUM(A.MENGE) AS ISSUE_DAY4,          -- 数量4
+        0 AS ISSUE_DAY5,
+        0 AS ISSUE_DAY6,
+        0 AS ISSUE_DAY7,
+        0 AS ISSUE_DAY8,
+        0 AS ISSUE_DAY9,
+        0 AS ISSUE_DAY10,
+        0 AS ISSUE_DAY11
+        FROM
+        `an1_SAP_LHT2nd.MATDOC` A
+        INNER JOIN
+        `an1_SAP_LHT2nd.EKKO` C
+        ON A.EBELN = C.EBELN
+        INNER JOIN
+        `an1_SAP_LHT2nd.CONVERSION_MAPPING` B
+        ON C.RESWK = B.WERKS
+        WHERE
+        A.BWART = '101'                       -- 移動タイプ (購買発注入庫)
+        AND A.WERKS = '10J0'                  -- 在庫転送オーダーにおける供給 (出庫) プラント
+        AND FORMAT_TIMESTAMP('%Y%m%d',A.CPUDT) = FORMAT_DATE('%Y%m%d', PARSE_DATE('%Y%m%d','{PROCESS_DATE}'))
+        GROUP BY
+        C.RESWK,
+        A.MATNR
+        -- 出庫データの取得：パターン5
+        UNION ALL
+        SELECT
+        A.WERKS AS WERKS,                     -- プラント
+        A.MATNR AS MATNR,                     -- 品目コード
+        0 AS ISSUE_DAY1,
+        0 AS ISSUE_DAY2,
+        0 AS ISSUE_DAY3,
+        0 AS ISSUE_DAY4,
+        SUM(A.MENGE) AS ISSUE_DAY5,         -- 数量5
+        0 AS ISSUE_DAY6,
+        0 AS ISSUE_DAY7,
+        0 AS ISSUE_DAY8,
+        0 AS ISSUE_DAY9,
+        0 AS ISSUE_DAY10,
+        0 AS ISSUE_DAY11
+        FROM
+        `an1_SAP_LHT2nd.MATDOC` A
+        INNER JOIN
+        `an1_SAP_LHT2nd.CONVERSION_MAPPING` B
+        ON A.WERKS =B.WERKS
+        INNER JOIN
+        `lixil-datahub-qas.SAP_CFIN.T001W` AS C
+        ON A.WERKS = C.WERKS
+        INNER JOIN
+        `an1_SAP_CFIN.ADRCT` AS D
+        ON  C.ADRNR = D.ADDRNUMBER
+        AND D.REMARK = '02'                   -- 物流センター
+        WHERE
+        A.BWART = '602'                       -- 移動タイプ (RE 出庫取消)
+        AND FORMAT_TIMESTAMP('%Y%m%d',A.CPUDT) = FORMAT_DATE('%Y%m%d', PARSE_DATE('%Y%m%d','{PROCESS_DATE}'))
+        GROUP BY
+        A.WERKS,
+        A.MATNR
+        -- 出庫データの取得：パターン6
+        UNION ALL
+        SELECT
+        A.WERKS AS WERKS,                     -- プラント
+        A.MATNR AS MATNR,                     -- 品目コード
+        0 AS ISSUE_DAY1,
+        0 AS ISSUE_DAY2,
+        0 AS ISSUE_DAY3,
+        0 AS ISSUE_DAY4,
+        0 AS ISSUE_DAY5,
+        SUM(A.MENGE) AS ISSUE_DAY6,          -- 数量6
+        0 AS ISSUE_DAY7,
+        0 AS ISSUE_DAY8,
+        0 AS ISSUE_DAY9,
+        0 AS ISSUE_DAY10,
+        0 AS ISSUE_DAY11
+        FROM
+        `an1_SAP_LHT2nd.MATDOC` A
+        INNER JOIN
+        `an1_SAP_LHT2nd.CONVERSION_MAPPING` B
+        ON A.WERKS =B.WERKS
+        INNER JOIN
+        `lixil-datahub-qas.SAP_CFIN.T001W` AS C
+        ON A.WERKS = C.WERKS
+        INNER JOIN
+        `an1_SAP_CFIN.ADRCT` AS D
+        ON  C.ADRNR = D.ADDRNUMBER
+        AND D.REMARK = '02'                   -- 物流センター
+        WHERE
+        A.BWART = '654'                     -- 移動タイプ (受注返品(利可)取消)
+        AND FORMAT_TIMESTAMP('%Y%m%d',A.CPUDT) = FORMAT_DATE('%Y%m%d', PARSE_DATE('%Y%m%d','{PROCESS_DATE}'))
+        GROUP BY
+        A.WERKS,
+        A.MATNR
+        -- 出庫データの取得：パターン7
+        UNION ALL
+        SELECT
+        A.WERKS AS WERKS,                     -- プラント
+        A.MATNR AS MATNR,                     -- 品目コード
+        0 AS ISSUE_DAY1,
+        0 AS ISSUE_DAY2,
+        0 AS ISSUE_DAY3,
+        0 AS ISSUE_DAY4,
+        0 AS ISSUE_DAY5,
+        0 AS ISSUE_DAY6,
+        SUM(A.MENGE) AS ISSUE_DAY7,          -- 数量7
+        0 AS ISSUE_DAY8,
+        0 AS ISSUE_DAY9,
+        0 AS ISSUE_DAY10,
+        0 AS ISSUE_DAY11
+        FROM
+        `an1_SAP_LHT2nd.MATDOC` A
+        INNER JOIN
+        `an1_SAP_LHT2nd.CONVERSION_MAPPING` B
+        ON A.WERKS =B.WERKS
+        INNER JOIN
+        `lixil-datahub-qas.SAP_CFIN.T001W` AS C
+        ON A.WERKS = C.WERKS
+        INNER JOIN
+        `an1_SAP_CFIN.ADRCT` AS D
+        ON  C.ADRNR = D.ADDRNUMBER
+        WHERE
+        A.BWART IN ('301', '641')             -- 移動タイプ (301:プラント間転送/641:転送出庫確認)
+        AND A.HEADER_COUNTER = 1              -- 入出庫伝票カウンタ
+        AND D.REMARK = '06'                   -- 住所注記
+        AND FORMAT_TIMESTAMP('%Y%m%d',A.CPUDT) = FORMAT_DATE('%Y%m%d', PARSE_DATE('%Y%m%d','{PROCESS_DATE}'))
+        GROUP BY
+        A.WERKS,
+        A.MATNR
+        -- 出庫データの取得：パターン8
+        UNION ALL
+        SELECT
+        A.WERKS AS WERKS,                     -- プラント
+        A.MATNR AS MATNR,                     -- 品目コード
+        0 AS ISSUE_DAY1,
+        0 AS ISSUE_DAY2,
+        0 AS ISSUE_DAY3,
+        0 AS ISSUE_DAY4,
+        0 AS ISSUE_DAY5,
+        0 AS ISSUE_DAY6,
+        0 AS ISSUE_DAY7,
+        SUM(A.MENGE) AS ISSUE_DAY8,          -- 数量8
+        0 AS ISSUE_DAY9,
+        0 AS ISSUE_DAY10,
+        0 AS ISSUE_DAY11
+        FROM
+        `an1_SAP_LHT2nd.MATDOC` A
+        INNER JOIN
+        `an1_SAP_LHT2nd.CONVERSION_MAPPING` B
+        ON A.WERKS =B.WERKS
+        INNER JOIN
+        `lixil-datahub-qas.SAP_CFIN.T001W` AS C
+        ON A.WERKS = C.WERKS
+        INNER JOIN
+        `an1_SAP_CFIN.ADRCT` AS D
+        ON  C.ADRNR = D.ADDRNUMBER
+        WHERE
+        A.BWART IN ('302', '642')             -- 移動タイプ (301:プラント間転送取消/642:転送出庫確認 取消)
+        AND A.HEADER_COUNTER = 0              -- 入出庫伝票カウンタ
+        AND D.REMARK = '06'                   -- 住所注記
+        AND FORMAT_TIMESTAMP('%Y%m%d',A.CPUDT) = FORMAT_DATE('%Y%m%d', PARSE_DATE('%Y%m%d','{PROCESS_DATE}'))
+        GROUP BY
+        A.WERKS,
+        A.MATNR
+        -- 出庫データの取得：パターン9
+        UNION ALL
+        SELECT
+        A.WERKS AS WERKS,                     -- プラント
+        A.MATNR AS MATNR,                     -- 品目コード
+        0 AS ISSUE_DAY1,
+        0 AS ISSUE_DAY2,
+        0 AS ISSUE_DAY3,
+        0 AS ISSUE_DAY4,
+        0 AS ISSUE_DAY5,
+        0 AS ISSUE_DAY6,
+        0 AS ISSUE_DAY7,
+        0 AS ISSUE_DAY8,
+        SUM(A.MENGE) AS ISSUE_DAY9,          -- 数量9
+        0 AS ISSUE_DAY10,
+        0 AS ISSUE_DAY11
+        FROM
+        `an1_SAP_LHT2nd.MATDOC` A
+        INNER JOIN
+        `an1_SAP_LHT2nd.CONVERSION_MAPPING` B
+        ON A.WERKS =B.WERKS
+        INNER JOIN
+        `lixil-datahub-qas.SAP_CFIN.T001W` AS C1
+        ON A.WERKS = C1.WERKS
+        INNER JOIN
+        `an1_SAP_CFIN.ADRCT` AS D1
+        ON  C1.ADRNR = D1.ADDRNUMBER
+        INNER JOIN
+        `an1_SAP_LHT2nd.PLANT_MAPPING` AS E
+        ON SUBSTR(A.KOSTL, 5, 4) = E.jigyou_cd
+        INNER JOIN
+        `lixil-datahub-qas.SAP_CFIN.T001W` AS C2
+        ON E.PLANT = C2.WERKS
+        INNER JOIN
+        `an1_SAP_CFIN.ADRCT` AS D2
+        ON  C2.ADRNR = D2.ADDRNUMBER
+        WHERE
+        A.BWART = 'ZD2'                      -- 移動タイプ (ZD2:転送入庫)
+        AND D1.REMARK IN ('05', '06')        -- 住所注記(入庫側)
+        AND D2.REMARK = '02'                 -- 住所注記(出庫側)
+        AND FORMAT_TIMESTAMP('%Y%m%d',A.CPUDT) = FORMAT_DATE('%Y%m%d', PARSE_DATE('%Y%m%d','{PROCESS_DATE}'))
+        GROUP BY
+        A.WERKS,
+        A.MATNR
+        -- 出庫データの取得：パターン10
+        UNION ALL
+        SELECT
+        A.WERKS AS WERKS,                     -- プラント
+        A.MATNR AS MATNR,                     -- 品目コード
+        0 AS ISSUE_DAY1,
+        0 AS ISSUE_DAY2,
+        0 AS ISSUE_DAY3,
+        0 AS ISSUE_DAY4,
+        0 AS ISSUE_DAY5,
+        0 AS ISSUE_DAY6,
+        0 AS ISSUE_DAY7,
+        0 AS ISSUE_DAY8,
+        0 AS ISSUE_DAY9,
+        SUM(A.MENGE) AS ISSUE_DAY10,          -- 数量10
+        0 AS ISSUE_DAY11
+        FROM
+        `an1_SAP_LHT2nd.MATDOC` A
+        INNER JOIN
+        `an1_SAP_LHT2nd.CONVERSION_MAPPING` B
+        ON A.WERKS =B.WERKS
+        INNER JOIN
+        `lixil-datahub-qas.SAP_CFIN.T001W` AS C
+        ON A.WERKS = C.WERKS
+        INNER JOIN
+        `an1_SAP_CFIN.ADRCT` AS D
+        ON  C.ADRNR = D.ADDRNUMBER
+        WHERE
+        A.BWART = 'ZB7'                       -- 移動タイプ (在庫の消費)
+        AND D.REMARK = '02'                   -- 住所注記
+        AND FORMAT_TIMESTAMP('%Y%m%d',A.CPUDT) = FORMAT_DATE('%Y%m%d', PARSE_DATE('%Y%m%d','{PROCESS_DATE}'))
+        GROUP BY
+        A.WERKS,
+        A.MATNR
+        -- 出庫データの取得：パターン11
+        UNION ALL
+        SELECT
+        A.WERKS AS WERKS,                     -- プラント
+        A.MATNR AS MATNR,                     -- 品目コード
+        0 AS ISSUE_DAY1,
+        0 AS ISSUE_DAY2,
+        0 AS ISSUE_DAY3,
+        0 AS ISSUE_DAY4,
+        0 AS ISSUE_DAY5,
+        0 AS ISSUE_DAY6,
+        0 AS ISSUE_DAY7,
+        0 AS ISSUE_DAY8,
+        0 AS ISSUE_DAY9,
+        0 AS ISSUE_DAY10,
+        SUM(A.MENGE) AS ISSUE_DAY11           -- 数量11
+        FROM
+        `an1_SAP_LHT2nd.MATDOC` A
+        INNER JOIN
+        `an1_SAP_LHT2nd.CONVERSION_MAPPING` B
+        ON A.WERKS =B.WERKS
+        INNER JOIN
+        `lixil-datahub-qas.SAP_CFIN.T001W` AS C
+        ON A.WERKS = C.WERKS
+        INNER JOIN
+        `an1_SAP_CFIN.ADRCT` AS D
+        ON  C.ADRNR = D.ADDRNUMBER
+        WHERE
+        A.BWART = 'ZB8'                       -- 移動タイプ (在庫の消費取消)
+        AND D.REMARK = '02'                   -- 住所注記
+        AND FORMAT_TIMESTAMP('%Y%m%d',A.CPUDT) = FORMAT_DATE('%Y%m%d', PARSE_DATE('%Y%m%d','{PROCESS_DATE}'))
+        GROUP BY
+        A.WERKS,
+        A.MATNR
+    ) AS A1
+    GROUP BY
+    A1.WERKS,
+    A1.MATNR
+)
+SELECT
+A1.WERKS,                                                       -- プラント
+IFNULL(A2.PRDHA, '') AS PRDHA,                                  -- 品目階層
+IFNULL(A2.ZZ_MATNMCD,'') AS ZZ_MATNMCD,                         -- 外部品目
+A1.MATNR,                                                       -- 品目
+SUM(A1.ISSUE_DAY1) AS ISSUE_DAY1,                               -- 出庫日計数量1
+SUM(A1.ISSUE_DAY2) AS ISSUE_DAY2,                               -- 出庫日計数量2
+SUM(A1.ISSUE_DAY3) AS ISSUE_DAY3,                               -- 出庫日計数量3
+SUM(A1.ISSUE_DAY4) AS ISSUE_DAY4,                               -- 出庫日計数量4
+SUM(A1.ISSUE_DAY5) AS ISSUE_DAY5,                               -- 出庫日計数量5
+SUM(A1.ISSUE_DAY6) AS ISSUE_DAY6,                               -- 出庫日計数量6
+SUM(A1.ISSUE_DAY7) AS ISSUE_DAY7,                               -- 出庫日計数量7
+SUM(A1.ISSUE_DAY8) AS ISSUE_DAY8,                               -- 出庫日計数量8
+SUM(A1.ISSUE_DAY9) AS ISSUE_DAY9,                               -- 出庫日計数量9
+SUM(A1.ISSUE_DAY10) AS ISSUE_DAY10,                             -- 出庫日計数量10
+SUM(A1.ISSUE_DAY11) AS ISSUE_DAY11,                             -- 出庫日計数量11
+SUM(A1.ISSUE_DAY) AS ISSUE_DAY,                                 -- 出庫（日計）
+PARSE_DATE('%Y%m%d','{PROCESS_DATE}') AS TIMESTAMP              -- 日付
+FROM ISSUE_DAY_W01 AS A1 
+LEFT JOIN `an1_SAP_LHT2nd.MARA` A2
+ON A1.MATNR = A2.MATNR
+GROUP BY
+A1.WERKS,
+A1.MATNR,
+A2.PRDHA,
+A2.ZZ_MATNMCD
+;
+
+
+-- 当日のSAPデータを登録する：出庫（累計）
+INSERT INTO `an1_SAP_LHT2nd.MC_SAP_DATA` (
+WERKS,
+PRDHA,
+ZZ_MATNMCD,
+MATNR,
+ISSUE_SUM,
+TIMESTAMP
+)
+SELECT
+A1.WERKS,                                                       -- プラント
+A1.PRDHA,                                                       -- 品目階層
+A1.ZZ_MATNMCD,                                                  -- 外部品目
+A1.MATNR,                                                       -- 品目
+SUM(A1.ISSUE_DAY) AS ISSUE_SUM,                                 -- 累計出庫数量
+PARSE_DATE('%Y%m%d','{PROCESS_DATE}') AS TIMESTAMP              -- 日付
+FROM `an1_SAP_LHT2nd.MC_SAP_DATA` A1
+WHERE
+TIMESTAMP >= DATE_TRUNC(PARSE_DATE('%Y%m%d','{PROCESS_DATE}'), MONTH) -- 今月の月初
+AND TIMESTAMP <= PARSE_DATE('%Y%m%d','{PROCESS_DATE}')                -- 当日まで
+AND ISSUE_DAY IS NOT NULL
+GROUP BY
+A1.WERKS,
+A1.PRDHA,
+A1.MATNR,
+A1.ZZ_MATNMCD
+;
+
+
+-- 当日のSAPデータを登録する：換算出庫
+INSERT INTO `an1_SAP_LHT2nd.MC_SAP_DATA` (
+WERKS,
+PRDHA,
+ZZ_MATNMCD,
+MATNR,
+WORK_DAYS_FOR_TODAY,
+WORK_DAYS_FOR_THIS_MONTH,
+CONVERSION_ISSUE,
+TIMESTAMP
+)
+-- 稼働日カレンダーマスタから必要な年間情報抽出
+WITH TFACS_YEAR AS (
+    SELECT
+    IDENT
+    ,JAHR AS YEAR
+    ,[STRUCT('01' AS MONTH,MON01 AS MONTH_FLAGS),STRUCT('02' AS MONTH,MON02 AS MONTH_FLAGS),STRUCT('03' AS MONTH,MON03 AS MONTH_FLAGS),
+      STRUCT('04' AS MONTH,MON04 AS MONTH_FLAGS),STRUCT('05' AS MONTH,MON05 AS MONTH_FLAGS),STRUCT('06' AS MONTH,MON06 AS MONTH_FLAGS),
+      STRUCT('07' AS MONTH,MON07 AS MONTH_FLAGS),STRUCT('08' AS MONTH,MON08 AS MONTH_FLAGS),STRUCT('09' AS MONTH,MON09 AS MONTH_FLAGS),
+      STRUCT('10' AS MONTH,MON10 AS MONTH_FLAGS),STRUCT('11' AS MONTH,MON11 AS MONTH_FLAGS),STRUCT('12' AS MONTH,MON12 AS MONTH_FLAGS)] AS MONTH_INFO
+    FROM `an1_SAP_LHT2nd.TFACS` 
+)
+-- 稼働日カレンダーマスタを縦持ちの月単位に変換
+,TFACS_MONTH AS (
+    SELECT
+    IDENT,
+    CONCAT(YEAR, MONTH_INFO.MONTH) AS YEAR_MONTH,
+    SPLIT(MONTH_INFO.MONTH_FLAGS, '') AS MONTH_FLAGS
+    FROM
+    TFACS_YEAR
+    CROSS JOIN
+    UNNEST(TFACS_YEAR.MONTH_INFO) AS MONTH_INFO
+)
+-- 稼働日カレンダーマスタを縦持ちの日単位に変換
+,TFACS_DAY AS (
+    SELECT
+    IDENT,
+    CONCAT(YEAR_MONTH, LPAD(CAST((DAY + 1) AS STRING), 2, '0')) AS YEAR_MONTH_DAY,
+    CAST(DAY_FLAGS AS INT64) AS DAY_FLAGS
+    FROM
+    TFACS_MONTH
+    CROSS JOIN
+    UNNEST(TFACS_MONTH.MONTH_FLAGS) AS DAY_FLAGS
+    WITH OFFSET AS DAY
+)
+-- 当月に当日までの稼働日数を計算
+,TFACS_TODAY AS (
+    SELECT
+    IDENT,
+    SUM(DAY_FLAGS) AS WORK_DAYS_FOR_TODAY
+    FROM TFACS_DAY
+    WHERE YEAR_MONTH_DAY BETWEEN FORMAT_DATE('%Y%m%d', PARSE_DATE('%Y%m%d', CONCAT(LEFT('{PROCESS_DATE}', 6), '01'))) 
+    AND FORMAT_DATE('%Y%m%d', PARSE_DATE('%Y%m%d', '{PROCESS_DATE}')) 
+    GROUP BY
+    IDENT
+)
+-- 当月の稼働日数を計算
+,TFACS_THIS_MONTH AS (
+    SELECT 
+    IDENT,
+    SUM(DAY_FLAGS) AS WORK_DAYS_FOR_THIS_MONTH
+    FROM TFACS_DAY
+    WHERE YEAR_MONTH_DAY >= CONCAT(LEFT('{PROCESS_DATE}', 6), '01')
+    AND YEAR_MONTH_DAY <= CONCAT(LEFT('{PROCESS_DATE}', 6), '31')
+    GROUP BY
+    IDENT
+)
+-- 換算出庫
+-- (物流からの出庫(累計)÷当日までの日数(LIXIL稼働カレンダーから抽出)）×21日(稼働日数)(LIXIL稼働カレンダーから抽出)
+SELECT
+A1.WERKS,                                                       -- プラント
+A1.PRDHA,                                                       -- 品目階層
+A1.ZZ_MATNMCD,                                                  -- 外部品目
+A1.MATNR,                                                       -- 品目
+TFACS_TODAY.WORK_DAYS_FOR_TODAY,                                -- 当月に当日まで稼働日数
+TFACS_THIS_MONTH.WORK_DAYS_FOR_THIS_MONTH,                      -- 当月稼働日数
+CEIL(A1.ISSUE_SUM / TFACS_TODAY.WORK_DAYS_FOR_TODAY 
+    * TFACS_THIS_MONTH.WORK_DAYS_FOR_THIS_MONTH) AS CONVERSION_ISSUE, -- 換算出庫数量
+PARSE_DATE('%Y%m%d','{PROCESS_DATE}') AS TIMESTAMP              -- 日付
+FROM `an1_SAP_LHT2nd.MC_SAP_DATA` A1
+INNER JOIN `lixil-datahub-qas.SAP_CFIN.T001W` AS T001W
+ON T001W.WERKS = A1.WERKS
+INNER JOIN TFACS_TODAY
+ON TFACS_TODAY.IDENT = T001W.FABKL                              -- 稼動日カレンダID
+INNER JOIN TFACS_THIS_MONTH
+ON TFACS_THIS_MONTH.IDENT = T001W.FABKL                         -- 稼動日カレンダID
+WHERE
+TIMESTAMP = PARSE_DATE('%Y%m%d','{PROCESS_DATE}')               -- 当日のみ
+AND ISSUE_SUM IS NOT NULL
+;
+
+
+-- 当日のSAPデータを登録する：3ヶ月平均出庫
+INSERT INTO `an1_SAP_LHT2nd.MC_SAP_DATA` (
+WERKS,
+PRDHA,
+ZZ_MATNMCD,
+MATNR,
+WORK_DAYS_FOR_THREE_MONTH,
+AVERAGE_ISSUE_THREEMONTH,
+TIMESTAMP
+)
+-- 稼働日カレンダーマスタから必要な年間情報抽出
+WITH TFACS_YEAR AS (
+    SELECT
+    IDENT
+    ,JAHR AS YEAR
+    ,[STRUCT('01' AS MONTH,MON01 AS MONTH_FLAGS),STRUCT('02' AS MONTH,MON02 AS MONTH_FLAGS),STRUCT('03' AS MONTH,MON03 AS MONTH_FLAGS),
+      STRUCT('04' AS MONTH,MON04 AS MONTH_FLAGS),STRUCT('05' AS MONTH,MON05 AS MONTH_FLAGS),STRUCT('06' AS MONTH,MON06 AS MONTH_FLAGS),
+      STRUCT('07' AS MONTH,MON07 AS MONTH_FLAGS),STRUCT('08' AS MONTH,MON08 AS MONTH_FLAGS),STRUCT('09' AS MONTH,MON09 AS MONTH_FLAGS),
+      STRUCT('10' AS MONTH,MON10 AS MONTH_FLAGS),STRUCT('11' AS MONTH,MON11 AS MONTH_FLAGS),STRUCT('12' AS MONTH,MON12 AS MONTH_FLAGS)] AS MONTH_INFO
+    FROM `an1_SAP_LHT2nd.TFACS` 
+)
+-- 稼働日カレンダーマスタを縦持ちの月単位に変換
+,TFACS_MONTH AS (
+    SELECT
+    IDENT,
+    CONCAT(YEAR, MONTH_INFO.MONTH) AS YEAR_MONTH,
+    SPLIT(MONTH_INFO.MONTH_FLAGS, '') AS MONTH_FLAGS
+    FROM
+    TFACS_YEAR
+    CROSS JOIN
+    UNNEST(TFACS_YEAR.MONTH_INFO) AS MONTH_INFO
+)
+-- 稼働日カレンダーマスタを縦持ちの日単位に変換
+,TFACS_DAY AS (
+    SELECT
+    IDENT,
+    CONCAT(YEAR_MONTH, LPAD(CAST((DAY + 1) AS STRING), 2, '0')) AS YEAR_MONTH_DAY,
+    CAST(DAY_FLAGS AS INT64) AS DAY_FLAGS
+    FROM
+    TFACS_MONTH
+    CROSS JOIN
+    UNNEST(TFACS_MONTH.MONTH_FLAGS) AS DAY_FLAGS
+    WITH OFFSET AS DAY
+)
+-- 3ヵ月前から当日までの稼働日数を計算
+,TFACS_THREE_MONTH AS (
+    SELECT 
+    IDENT,
+    SUM(DAY_FLAGS) AS WORK_DAYS_FOR_THREE_MONTH
+    FROM TFACS_DAY
+    WHERE YEAR_MONTH_DAY BETWEEN FORMAT_DATE('%Y%m%d', DATE_ADD(DATE_SUB(PARSE_DATE('%Y%m%d', '{PROCESS_DATE}'), INTERVAL 3 MONTH), INTERVAL 1 DAY)) 
+    AND FORMAT_DATE('%Y%m%d', PARSE_DATE('%Y%m%d', '{PROCESS_DATE}')) 
+    GROUP BY
+    IDENT
+)
+-- 3ヶ月平均出庫
+-- 過去3か月実績ベースの物流からの出庫数÷稼働カレンダにある稼働日
+SELECT
+A1.WERKS,                                                       -- プラント
+A1.PRDHA,                                                       -- 品目階層
+A1.ZZ_MATNMCD,                                                  -- 外部品目
+A1.MATNR,                                                       -- 品目
+TFACS_THREE_MONTH.WORK_DAYS_FOR_THREE_MONTH,                    -- 3ヶ月稼働日数
+CEIL(A1.ISSUE_SUM_THREEMONTH / TFACS_THREE_MONTH.WORK_DAYS_FOR_THREE_MONTH) AS AVERAGE_ISSUE_THREEMONTH, -- 3ヶ月平均出庫
+PARSE_DATE('%Y%m%d','{PROCESS_DATE}') AS TIMESTAMP              -- 日付
+FROM (
+    SELECT
+    WERKS,
+    PRDHA,
+    ZZ_MATNMCD,
+    MATNR,
+    SUM(ISSUE_DAY) AS ISSUE_SUM_THREEMONTH
+    FROM `an1_SAP_LHT2nd.MC_SAP_DATA`
+    WHERE
+    TIMESTAMP >= DATE_ADD(DATE_SUB(PARSE_DATE('%Y%m%d','{PROCESS_DATE}'), INTERVAL 3 MONTH), INTERVAL 1 DAY) -- 3ヵ月前の翌日から
+    AND TIMESTAMP <= PARSE_DATE('%Y%m%d','{PROCESS_DATE}')                                                   -- 当日まで
+    AND ISSUE_DAY IS NOT NULL
+    GROUP BY
+    WERKS,
+    MATNR,
+    PRDHA,
+    ZZ_MATNMCD
+) A1
+INNER JOIN `lixil-datahub-qas.SAP_CFIN.T001W` AS T001W
+ON T001W.WERKS = A1.WERKS
+INNER JOIN TFACS_THREE_MONTH
+ON TFACS_THREE_MONTH.IDENT = T001W.FABKL                        -- 稼動日カレンダID
+;
+
+
+-- 当日のSAPデータを登録する：前月末在庫
+INSERT INTO `an1_SAP_LHT2nd.MC_SAP_DATA` (
+WERKS,
+PRDHA,
+ZZ_MATNMCD,
+MATNR,
+LASTMONTH_STOCK1,
+LASTMONTH_STOCK2,
+LASTMONTH_STOCK,
+TIMESTAMP
+)
+-- 前月末在庫データの取得：パターン1
+WITH ISSUE_LASTMONTH_01 AS (
+    SELECT
+    A.MATNR AS MATNR,      -- 品目コード
+    A.BWKEY AS WERKS,      -- 評価レベル
+    SUM(A.LBKUM) AS LBKUM1 -- 評価在庫合計
+    FROM
+    `an1_SAP_LHT2nd.MBEW` A -- 品目評価
+    INNER JOIN
+    `an1_SAP_LHT2nd.CONVERSION_MAPPING` B
+    ON
+    A.BWKEY = B.WERKS
+    WHERE
+    A.BWTAR = ' '          -- 評価タイプ
+    GROUP BY
+    A.MATNR,
+    A.BWKEY
+)
+-- 前月末在庫データの取得：パターン2
+,ISSUE_LASTMONTH_02 AS (
+    SELECT
+    A.MATNR AS MATNR,      -- 品目コード
+    A.BWKEY AS WERKS,      -- 評価レベル
+    SUM(A.LBKUM) AS LBKUM2 -- 評価在庫合計
+    FROM
+    `an1_SAP_LHT2nd.EBEW` A --  受注在庫評価情報
+    INNER JOIN
+    `an1_SAP_LHT2nd.CONVERSION_MAPPING` B
+    ON A.BWKEY = B.WERKS
+    WHERE
+    A.BWTAR = ' '          -- 評価タイプ
+    AND A.SOBKZ = 'E'      -- 特殊在庫区分
+    GROUP BY
+    A.MATNR,
+    A.BWKEY
+)
+-- 前月末在庫
+, ISSUE_LASTMONTH_W01 AS (
+    SELECT
+    IFNULL(ISSUE_LASTMONTH_01.WERKS,ISSUE_LASTMONTH_02.WERKS) AS WERKS,                             -- プラント
+    IFNULL(ISSUE_LASTMONTH_01.MATNR,ISSUE_LASTMONTH_02.MATNR) AS MATNR,                             -- 品目コード
+    IFNULL(ISSUE_LASTMONTH_01.LBKUM1,0) AS LASTMONTH_STOCK1,                                        -- 前月末在庫１
+    IFNULL(ISSUE_LASTMONTH_02.LBKUM2,0) AS LASTMONTH_STOCK2,                                        -- 前月末在庫２
+    (IFNULL(ISSUE_LASTMONTH_01.LBKUM1,0) + IFNULL(ISSUE_LASTMONTH_02.LBKUM2,0)) AS LASTMONTH_STOCK  -- 前月末在庫
+    FROM
+    ISSUE_LASTMONTH_01
+    FULL JOIN
+    ISSUE_LASTMONTH_02
+    ON  ISSUE_LASTMONTH_01.MATNR = ISSUE_LASTMONTH_02.MATNR
+    AND ISSUE_LASTMONTH_01.WERKS = ISSUE_LASTMONTH_02.WERKS
+)
+SELECT
+A1.WERKS,                                                       -- プラント
+IFNULL(A2.PRDHA, '') AS PRDHA,                                  -- 品目階層
+IFNULL(A2.ZZ_MATNMCD,'') AS ZZ_MATNMCD,                         -- 外部品目
+A1.MATNR,                                                       -- 品目
+SUM(A1.LASTMONTH_STOCK1) AS LASTMONTH_STOCK1,                   -- 前月末在庫1
+SUM(A1.LASTMONTH_STOCK2) AS LASTMONTH_STOCK2,                   -- 前月末在庫2
+SUM(A1.LASTMONTH_STOCK) AS LASTMONTH_STOCK,                     -- 前月末在庫
+PARSE_DATE('%Y%m%d','{PROCESS_DATE}') AS TIMESTAMP              -- 日付
+FROM ISSUE_LASTMONTH_W01 AS A1
+LEFT JOIN `an1_SAP_LHT2nd.MARA` A2
+ON A1.MATNR = A2.MATNR
+GROUP BY
+A1.WERKS,
+A1.MATNR,
+A2.PRDHA,
+A2.ZZ_MATNMCD
+;
+
+
+-- 当日のSAPデータを登録する：有効在庫
+INSERT INTO `an1_SAP_LHT2nd.MC_SAP_DATA` (
+WERKS,
+PRDHA,
+ZZ_MATNMCD,
+MATNR,
+AVAILABLE_STOCK1,
+AVAILABLE_STOCK2,
+AVAILABLE_STOCK3,
+AVAILABLE_STOCK,
+TIMESTAMP
+)
+-- 有効在庫データの取得：パターン1
+WITH AVAILABLE_STOCK_01 AS (
+    SELECT
+    A.MATNR AS MATNR,                  -- 品目コード
+    A.WERKS AS WERKS,                  -- プラント
+    SUM(A.LABST) AS MARD_LABST         -- 利用可能評価在庫
+    FROM
+    `an1_SAP_LHT2nd.MARD` A -- 品目の保管場所データ情報
+    INNER JOIN
+    `an1_SAP_LHT2nd.CONVERSION_MAPPING` B
+    ON A.WERKS =B.WERKS
+    WHERE
+    A.LGORT LIKE '%00'                 -- 保管場所
+    GROUP BY
+    A.MATNR,
+    A.WERKS
+)
+-- 有効在庫データの取得：パターン2
+,AVAILABLE_STOCK_02 AS (
+    SELECT
+    A.MATNR AS MATNR,                  -- 品目コード
+    A.WERKS AS WERKS,                  -- プラント
+    SUM(A.KALAB) AS MSKA_KALAB         -- 利用可能評価在庫
+    FROM
+    `an1_SAP_LHT2nd.MSKA` A -- 受注在庫情報
+    INNER JOIN
+    `an1_SAP_LHT2nd.CONVERSION_MAPPING` B
+    ON A.WERKS =B.WERKS
+    WHERE
+    A.LGORT LIKE '%00'                 -- 保管場所
+    AND A.SOBKZ = 'E'                  -- 特殊在庫区分
+    GROUP BY
+    A.MATNR,
+    A.WERKS
+)
+-- 引当済在庫
+, ALLOCATED_STOCK_W01 AS (
+    SELECT
+    B.WERKS AS WERKS,                         -- プラント
+    B.MATNR AS MATNR,                         -- 品目コード
+    IFNULL(SUM(B.LFIMG),0) AS ALLOCATED_STOCK -- 引当済在庫
+    FROM
+    `an1_SAP_LHT2nd.LIKP` A        -- 出荷伝票(ヘッダデータ)
+    INNER JOIN
+    `an1_SAP_LHT2nd.LIPS` B        -- 出荷伝票(明細データ)
+    ON
+    A.VBELN = B.VBELN                         -- 出荷伝票
+    INNER JOIN
+    `an1_SAP_LHT2nd.CONVERSION_MAPPING` C
+    ON B.WERKS = C.WERKS
+    WHERE
+    A.VBTYP = 'J'                             -- 販売管理伝票カテゴリ
+    AND A.ZZ_DVYCMPFLG = 'X'                  -- 入出荷完了フラグ
+    AND B.WBSTA = 'A'                         -- 在庫移動ステータス
+    --AND FORMAT_TIMESTAMP('%Y%m%d',A.ERDAT) = FORMAT_DATE('%Y%m%d', PARSE_DATE('%Y%m%d','{PROCESS_DATE}'))
+    GROUP BY
+    B.MATNR,
+    B.WERKS
+)
+-- 有効在庫データの取得：パターン3
+,AVAILABLE_STOCK_03 AS (
+    SELECT
+    A.MATNR AS MATNR,                  -- 品目コード
+    A.WERKS AS WERKS,                  -- プラント
+    A.ALLOCATED_STOCK AS ALLOCATED_STOCK
+    FROM
+    ALLOCATED_STOCK_W01 AS A
+)
+-- 有効在庫
+,AVAILABLE_STOCK_W01 AS (
+    SELECT
+    IFNULL(W12.WERKS, W03.WERKS) AS WERKS,                   -- プラント
+    IFNULL(W12.MATNR, W03.MATNR) AS MATNR,                   -- 品目コード
+    IFNULL(W12.MARD_LABST, 0) AS AVAILABLE_STOCK1,           -- 有効在庫1
+    IFNULL(W12.MSKA_KALAB, 0) AS AVAILABLE_STOCK2,           -- 有効在庫2
+    -1 * IFNULL(W03.ALLOCATED_STOCK, 0) AS AVAILABLE_STOCK3, -- 有効在庫3
+    (IFNULL(W12.AVAILABLE_STOCK, 0) - IFNULL(W03.ALLOCATED_STOCK, 0)) AS AVAILABLE_STOCK -- 有効在庫
+    FROM (
+        SELECT
+        IFNULL(AVAILABLE_STOCK_01.WERKS, AVAILABLE_STOCK_02.WERKS) AS WERKS,
+        IFNULL(AVAILABLE_STOCK_01.MATNR, AVAILABLE_STOCK_02.MATNR) AS MATNR,
+        IFNULL(AVAILABLE_STOCK_01.MARD_LABST, 0) AS MARD_LABST,
+        IFNULL(AVAILABLE_STOCK_02.MSKA_KALAB, 0) AS MSKA_KALAB,
+        (IFNULL(AVAILABLE_STOCK_01.MARD_LABST, 0) + IFNULL(AVAILABLE_STOCK_02.MSKA_KALAB, 0)) AS AVAILABLE_STOCK
+        FROM
+        AVAILABLE_STOCK_01
+        FULL JOIN
+        AVAILABLE_STOCK_02
+        ON  AVAILABLE_STOCK_01.MATNR = AVAILABLE_STOCK_02.MATNR
+        AND AVAILABLE_STOCK_01.WERKS = AVAILABLE_STOCK_02.WERKS
+    ) AS W12
+    LEFT JOIN
+    AVAILABLE_STOCK_03 AS W03
+    ON  W12.MATNR = W03.MATNR
+    AND W12.WERKS = W03.WERKS
+)
+SELECT
+A1.WERKS,                                                       -- プラント
+IFNULL(A2.PRDHA, '') AS PRDHA,                                  -- 品目階層
+IFNULL(A2.ZZ_MATNMCD,'') AS ZZ_MATNMCD,                         -- 外部品目
+A1.MATNR,                                                       -- 品目
+SUM(A1.AVAILABLE_STOCK1) AS AVAILABLE_STOCK1,                   -- 有効在庫1
+SUM(A1.AVAILABLE_STOCK2) AS AVAILABLE_STOCK2,                   -- 有効在庫2
+SUM(A1.AVAILABLE_STOCK3) AS AVAILABLE_STOCK3,                   -- 有効在庫3
+SUM(A1.AVAILABLE_STOCK) AS AVAILABLE_STOCK,                     -- 有効在庫
+PARSE_DATE('%Y%m%d','{PROCESS_DATE}') AS TIMESTAMP              -- 日付
+FROM AVAILABLE_STOCK_W01 AS A1
+LEFT JOIN `an1_SAP_LHT2nd.MARA` A2
+ON A1.MATNR = A2.MATNR
+GROUP BY
+A1.WERKS,
+A1.MATNR,
+A2.PRDHA,
+A2.ZZ_MATNMCD
+;
+
+
+-- 当日のSAPデータを登録する：移動中在庫
+INSERT INTO `an1_SAP_LHT2nd.MC_SAP_DATA` (
+WERKS,
+PRDHA,
+ZZ_MATNMCD,
+MATNR,
+MOVING_STOCK1,
+MOVING_STOCK2,
+MOVING_STOCK,
+TIMESTAMP
+)
+-- 移動中在庫
+WITH MOVING_STOCK_W01 AS (
+    SELECT
+    A.WERKS AS WERKS,                                  -- プラント
+    A.MATNR AS MATNR,                                  -- 品目コード
+    SUM(B.WAMNG) AS MOVING_STOCK1,                     -- 移動中在庫1(出庫)
+    -1 * SUM(B.WEMNG) AS MOVING_STOCK2,                -- 移動中在庫2(入庫)
+    (SUM(B.WAMNG) - SUM(B.WEMNG)) AS MOVING_STOCK      -- 移動中在庫
+    FROM
+    `an1_SAP_LHT2nd.EKPO` A -- 購買伝票明細
+    INNER JOIN
+    `an1_SAP_LHT2nd.EKET` B -- 分納契約納入日程行
+    ON  A.EBELN = B.EBELN                              -- 購買伝票番号
+    AND A.EBELP = B.EBELP                              -- 購買伝票の明細番号
+    INNER JOIN
+    `an1_SAP_LHT2nd.EKKO` C -- 購買伝票ヘッダ
+    ON  A.EBELN = C.EBELN
+    INNER JOIN
+    `an1_SAP_LHT2nd.CONVERSION_MAPPING` D
+    ON
+    A.WERKS = D.WERKS
+    WHERE
+    A.ELIKZ = ' '                                      -- 納入完了区分：' '(ブランク)
+    AND A.PSTYP = '7'                                  -- 購買伝票の明細カテゴリ：7(在庫転送)
+    AND EXISTS (
+        SELECT
+        1
+        FROM
+        `an1_SAP_LHT2nd.CONVERSION_MAPPING` DD
+        WHERE
+        C.RESWK = DD.WERKS                             -- 在庫転送オーダーにおける供給 (出庫) プラント
+    )
+    GROUP BY
+    A.MATNR,
+    A.WERKS
+)
+SELECT
+A1.WERKS,                                                       -- プラント
+IFNULL(A2.PRDHA, '') AS PRDHA,                                  -- 品目階層
+IFNULL(A2.ZZ_MATNMCD,'') AS ZZ_MATNMCD,                         -- 外部品目
+A1.MATNR,                                                       -- 品目
+SUM(A1.MOVING_STOCK1) AS MOVING_STOCK1,                         -- 移動中在庫1
+SUM(A1.MOVING_STOCK2) AS MOVING_STOCK2,                         -- 移動中在庫2
+SUM(A1.MOVING_STOCK) AS MOVING_STOCK,                           -- 移動中在庫
+PARSE_DATE('%Y%m%d','{PROCESS_DATE}') AS TIMESTAMP              -- 日付
+FROM MOVING_STOCK_W01 AS A1
+LEFT JOIN `an1_SAP_LHT2nd.MARA` A2
+ON A1.MATNR = A2.MATNR
+GROUP BY
+A1.WERKS,
+A1.MATNR,
+A2.PRDHA,
+A2.ZZ_MATNMCD
+;
+
+
+-- 当日のSAPデータを登録する：不可在庫
+INSERT INTO `an1_SAP_LHT2nd.MC_SAP_DATA` (
+WERKS,
+PRDHA,
+ZZ_MATNMCD,
+MATNR,
+NON_STOCK1,
+NON_STOCK2,
+NON_STOCK,
+TIMESTAMP
+)
+-- 不可在庫データの取得：パターン1
+WITH NON_STOCK_01 AS (
+    SELECT
+    A.MATNR AS MATNR,                  -- 品目コード
+    A.WERKS AS WERKS,                  -- プラント
+    SUM(A.LABST) AS LABST_MARD         -- 利用可能評価在庫
+    FROM
+    `an1_SAP_LHT2nd.MARD` A -- 品目の保管場所データ情報
+    INNER JOIN
+    `an1_SAP_LHT2nd.CONVERSION_MAPPING` B
+    ON A.WERKS =B.WERKS
+    WHERE
+    A.LGORT NOT LIKE '%00'             -- 保管場所
+    GROUP BY
+    A.MATNR,
+    A.WERKS
+)
+-- 不可在庫データの取得：パターン2
+,NON_STOCK_02 AS (
+    SELECT
+    A.MATNR AS MATNR,                  -- 品目コード
+    A.WERKS AS WERKS,                  -- プラント
+    SUM(A.KALAB) AS KALAB_MSKA         -- 利用可能評価在庫
+    FROM
+    `an1_SAP_LHT2nd.MSKA` A -- 受注在庫情報
+    INNER JOIN
+    `an1_SAP_LHT2nd.CONVERSION_MAPPING` B
+    ON A.WERKS =B.WERKS
+    WHERE
+    A.LGORT NOT LIKE '%00'             -- 保管場所
+    AND A.SOBKZ = 'E'                  -- 特殊在庫区分
+    GROUP BY
+    A.MATNR,
+    A.WERKS
+)
+-- 不可在庫
+,NON_STOCK_W01 AS (
+    SELECT
+    IFNULL(NON_STOCK_01.WERKS, NON_STOCK_02.WERKS) AS WERKS, -- プラント
+    IFNULL(NON_STOCK_01.MATNR, NON_STOCK_02.MATNR) AS MATNR, -- 品目コード
+    IFNULL(NON_STOCK_01.LABST_MARD, 0) AS NON_STOCK1,        -- 不可在庫1
+    IFNULL(NON_STOCK_02.KALAB_MSKA, 0) AS NON_STOCK2,        -- 不可在庫2
+    (IFNULL(NON_STOCK_01.LABST_MARD, 0) + IFNULL(NON_STOCK_02.KALAB_MSKA, 0)) AS NON_STOCK -- 不可在庫
+    FROM
+    NON_STOCK_01
+    FULL JOIN
+    NON_STOCK_02
+    ON  NON_STOCK_01.MATNR = NON_STOCK_02.MATNR
+    AND NON_STOCK_01.WERKS = NON_STOCK_02.WERKS
+)
+SELECT
+A1.WERKS,                                                       -- プラント
+IFNULL(A2.PRDHA, '') AS PRDHA,                                  -- 品目階層
+IFNULL(A2.ZZ_MATNMCD,'') AS ZZ_MATNMCD,                         -- 外部品目
+A1.MATNR,                                                       -- 品目
+SUM(A1.NON_STOCK1) AS NON_STOCK1,                               -- 不可在庫1
+SUM(A1.NON_STOCK2) AS NON_STOCK2,                               -- 不可在庫2
+SUM(A1.NON_STOCK) AS NON_STOCK,                                 -- 不可在庫
+PARSE_DATE('%Y%m%d','{PROCESS_DATE}') AS TIMESTAMP              -- 日付
+FROM NON_STOCK_W01 AS A1 
+LEFT JOIN `an1_SAP_LHT2nd.MARA` A2
+ON A1.MATNR = A2.MATNR
+GROUP BY
+A1.WERKS,
+A1.MATNR,
+A2.PRDHA,
+A2.ZZ_MATNMCD
+;
+
+
+-- 当日のSAPデータを登録する：引当済在庫
+INSERT INTO `an1_SAP_LHT2nd.MC_SAP_DATA` (
+WERKS,
+PRDHA,
+ZZ_MATNMCD,
+MATNR,
+ALLOCATED_STOCK,
+TIMESTAMP
+)
+-- 引当済在庫
+WITH ALLOCATED_STOCK_W01 AS (
+    SELECT
+    B.WERKS AS WERKS,                         -- プラント
+    B.MATNR AS MATNR,                         -- 品目コード
+    IFNULL(SUM(B.LFIMG),0) AS ALLOCATED_STOCK -- 引当済在庫
+    FROM
+    `an1_SAP_LHT2nd.LIKP` A        -- 出荷伝票(ヘッダデータ)
+    INNER JOIN
+    `an1_SAP_LHT2nd.LIPS` B        -- 出荷伝票(明細データ)
+    ON
+    A.VBELN = B.VBELN                         -- 出荷伝票
+    INNER JOIN
+    `an1_SAP_LHT2nd.CONVERSION_MAPPING` C
+    ON B.WERKS = C.WERKS
+    WHERE
+    A.VBTYP = 'J'                             -- 販売管理伝票カテゴリ
+    AND A.ZZ_DVYCMPFLG = 'X'                  -- 入出荷完了フラグ
+    AND B.WBSTA = 'A'                         -- 在庫移動ステータス
+    --AND FORMAT_TIMESTAMP('%Y%m%d',A.ERDAT) = FORMAT_DATE('%Y%m%d', PARSE_DATE('%Y%m%d','{PROCESS_DATE}'))
+    GROUP BY
+    B.MATNR,
+    B.WERKS
+)
+SELECT
+A1.WERKS,                                                       -- プラント
+IFNULL(A2.PRDHA, '') AS PRDHA,                                  -- 品目階層
+IFNULL(A2.ZZ_MATNMCD,'') AS ZZ_MATNMCD,                         -- 外部品目
+A1.MATNR,                                                       -- 品目
+SUM(A1.ALLOCATED_STOCK) AS ALLOCATED_STOCK,                     -- 引当済在庫
+PARSE_DATE('%Y%m%d','{PROCESS_DATE}') AS TIMESTAMP              -- 日付
+FROM ALLOCATED_STOCK_W01 AS A1
+LEFT JOIN `an1_SAP_LHT2nd.MARA` A2
+ON A1.MATNR = A2.MATNR
+GROUP BY
+A1.WERKS,
+A1.MATNR,
+A2.PRDHA,
+A2.ZZ_MATNMCD
+;
+
+
+-- 既存当日と31日以前の公開用マートテーブルのデータを削除する
+DELETE
+FROM
+`an1_SAP_LHT2nd.MC_DATA`
+WHERE
+TIMESTAMP = PARSE_DATE('%Y%m%d','{PROCESS_DATE}')
+OR TIMESTAMP <= DATE_SUB(PARSE_DATE('%Y%m%d','{PROCESS_DATE}'), INTERVAL 31 DAY)
+;
+
+
+-- 当日のマートデータを登録する
+INSERT INTO `an1_SAP_LHT2nd.MC_DATA`
+SELECT
+IFNULL(W04.KJCODE, '') AS BRANCHCD,             -- 事業所コード
+IFNULL(W04.LINE, '') AS LINECD,                 -- ラインコード
+IFNULL(W04.KJGRP, '') AS  KJGRP,                -- 責任グループ
+IFNULL(W04.THAIKBN, '') AS THAIKBN,             -- タイ区分
+IFNULL(W05.syouhinbu_kbn, '') AS SYOUHINBU_KBN, -- 商品部区分
+IFNULL(W05.ukeharai_cd, '') AS UKEHARAI_CD,     -- 受払コード
+IFNULL(W03.BRAND, '') AS BRAND,                 -- 品種
+W01.PRDHA,                                      -- 品目階層
+CASE LEFT(IFNULL(W01.PRDHA, ''), 2)
+    WHEN '10' THEN 'トイレ'
+    WHEN '11' THEN '洗面化粧台'
+    WHEN '12' THEN '浴室'
+    WHEN '13' THEN '水栓金具'
+    WHEN '14' THEN 'タイル'
+    WHEN '15' THEN 'キッチン'
+    WHEN '16' THEN 'サッシ'
+    WHEN '17' THEN 'OR商品'
+    WHEN '18' THEN 'ドア'
+    WHEN '19' THEN 'エクステリア'
+    WHEN '1A' THEN 'インテリア建材'
+    WHEN '1B' THEN '外装'
+    WHEN '1C' THEN '構造体'
+    WHEN '1D' THEN '電器設備'
+    WHEN '1E' THEN '産業用形材製品'
+    WHEN '1F' THEN 'ビル建材'
+    WHEN '1G' THEN '再生木'
+    WHEN '80' THEN 'その他'
+    WHEN '96' THEN '共通'
+    ELSE '不明' END AS PRDHA_N,                 -- 品目階層名
+W01.ZZ_MATNMCD,                                 -- 外部品目コード
+W01.MATNR,                                      -- 品目コード
+W02.AREA_KBN,                                   -- 地域
+W01.WERKS,                                      -- 物流プラントコード
+W01.RECEIPT_DAY,                                -- 入庫（日計）
+W01.RECEIPT_SUM,                                -- 入庫（累計）
+W01.ISSUE_DAY,                                  -- 出庫（日計）
+W01.ISSUE_SUM,                                  -- 出庫（累計）
+W01.CONVERSION_ISSUE,                           -- 換算出庫
+W01.AVERAGE_ISSUE_THREEMONTH,                   -- 3ヶ月平均出庫
+W01.LASTMONTH_STOCK,                            -- 前月末在庫
+W01.AVAILABLE_STOCK,                            -- 有効在庫
+W01.MOVING_STOCK,                               -- 移動中在庫
+W01.NON_STOCK,                                  -- 不可在庫
+W01.ALLOCATED_STOCK,                            -- 引当済在庫
+W01.TIMESTAMP                                   -- 日付
+FROM
+(
+    SELECT
+    A.WERKS,                                                               -- プラント
+    A.PRDHA,                                                               -- 品目階層
+    A.ZZ_MATNMCD,                                                          -- 外部品目コード
+    MAX(A.MATNR) AS MATNR,                                                 -- 品目コード(代表の最大値)
+    CASE WHEN IFNULL(B.REPRESENTATIVECD, '') <> '' THEN B.REPRESENTATIVECD -- 代表コード
+         ELSE A.ZZ_MATNMCD                                                 -- 外部品目
+         END AS COMMODITYCD,                                               -- 商品コード
+    SUM(IFNULL(RECEIPT_DAY, 0)) AS RECEIPT_DAY,                            -- 入庫（日計）
+    SUM(IFNULL(RECEIPT_SUM, 0)) AS RECEIPT_SUM,                            -- 入庫（累計）
+    SUM(IFNULL(ISSUE_DAY, 0)) AS ISSUE_DAY,                                -- 出庫（日計）
+    SUM(IFNULL(ISSUE_SUM, 0)) AS ISSUE_SUM,                                -- 出庫（累計）
+    SUM(IFNULL(CONVERSION_ISSUE, 0)) AS CONVERSION_ISSUE,                  -- 換算出庫
+    SUM(IFNULL(AVERAGE_ISSUE_THREEMONTH, 0)) AS AVERAGE_ISSUE_THREEMONTH,  -- 3ヶ月平均出庫
+    SUM(IFNULL(LASTMONTH_STOCK, 0)) AS LASTMONTH_STOCK,                    -- 前月末在庫
+    SUM(IFNULL(AVAILABLE_STOCK, 0)) AS AVAILABLE_STOCK,                    -- 有効在庫
+    SUM(IFNULL(MOVING_STOCK, 0)) AS MOVING_STOCK,                          -- 移動中在庫
+    SUM(IFNULL(NON_STOCK, 0)) AS NON_STOCK,                                -- 不可在庫
+    SUM(IFNULL(ALLOCATED_STOCK, 0)) AS ALLOCATED_STOCK,                    -- 引当済在庫
+    A.TIMESTAMP                        -- 日付
+    FROM
+    `an1_SAP_LHT2nd.MC_SAP_DATA` A
+    LEFT JOIN
+    `an1_warks_db2.STANDARDCOMMODITY` B -- 規格商品マスタ
+    ON A.ZZ_MATNMCD = B.COMMODITYCD
+    WHERE
+    A.TIMESTAMP = PARSE_DATE('%Y%m%d', '{PROCESS_DATE}')
+    GROUP BY 
+    A.WERKS,
+    A.PRDHA,
+    A.ZZ_MATNMCD,
+    -- A.MATNR,
+    COMMODITYCD,
+    A.TIMESTAMP
+) W01
+INNER JOIN
+`an1_SAP_LHT2nd.CONVERSION_MAPPING` W02
+ON W01.WERKS = W02.WERKS
+LEFT JOIN
+`an1_warks_db2.REPRESENTATIVECOMMODITY` W03    -- 代表商品マスタ
+ON W01.COMMODITYCD = W03.COMMODITYCD
+LEFT JOIN
+`an1_timelydb.M_RESPONSIBLE_FACTORY_DAEH9` W04 -- 責任工場
+ON  W02.AREA_KBN = W04.KJAREA
+AND W01.ZZ_MATNMCD = W04.KISYU
+LEFT JOIN
+`an1_SAPFront_LHT.M_TRAIN_Shohin` W05          -- TRAIN商品マスタ
+ON W01.ZZ_MATNMCD = W05.syouhin_cd
+;

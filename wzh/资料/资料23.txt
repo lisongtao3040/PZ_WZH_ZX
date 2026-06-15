@@ -1,0 +1,40 @@
+TES
+https://drive.google.com/drive/folders/1KAChCKfOr9Yw2p6oUMnIi2pYJTP1QM2Y
+
+
+文档文件夹      ：https://drive.google.com/drive/folders/1E70bBu5jTbJsR5k1QVn11FO_B0QuAsM6
+成果物一览（卢）：https://docs.google.com/spreadsheets/d/1QDIAqzAS01R8xrbfrwIAeeRnpypKxAXFuiM4cqmCiW8/edit?pli=1&gid=1784613429#gid=1784613429
+
+テスト環境：
+STG環境：
+本番環境：
+
+
+
+Bitbucket
+	https://bitbucket.org/lixilg/workspace/projects/KSFS
+バッチ関連リポジトリ:KSFS-batch
+	https://bitbucket.org/lixilg/ksfs-batch
+TES関連リポジトリ:KSFS-TES
+	https://bitbucket.org/lixilg/ksfs-tes
+
+
+Bitbucket
+	https://bitbucket.org/lixilg/workspace/projects/KSFS
+バッチ関連リポジトリ:KSFS-batch
+	https://bitbucket.org/lixilg/ksfs-batch
+TES関連リポジトリ:KSFS-TES
+	https://bitbucket.org/lixilg/ksfs-tes
+
+
+CREATE PROCEDURE `函数名`()
+BEGIN
+---自己的sql
+END;
+
+
+鐘 吉超
+
+
+[outsystems],[sapfront_tx],[transferhub]３つDBについて、
+同じDBサーバですか？

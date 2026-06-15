@@ -1,0 +1,11 @@
+https://docs.google.com/spreadsheets/d/1aaaal0SXtVq2qksB96CEOUvjhBDM3Bwi?rtpof=true&usp=drive_fs
+
+林 李 13:12
+https://docs.google.com/spreadsheets/d/1vmZ9H2BEw-2sC6-Y78IuZkW6Lj9F0Htb1zmDzp2VoMU/edit?gid=225095000#gid=225095000
+http://www.intra.lixil.co.jp/contents/aba00357/kogataki/irairule/irai-rule-op.htm
+
+
+请根据数据库中实际字段生成
+
+比如
+sapfront_tx.dbo.OrderHeader中，没有InterfaceId，正确的是 [I_IFIDFLD]

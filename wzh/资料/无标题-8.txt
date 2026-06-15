@@ -1,0 +1,5 @@
+SELECT InterfaceRequestNumber,Result FROM TrainResultReceiveWork WHERE InterfaceRequestNumber=?
+指定されたドランク
+
+==Nested Error== (0x8004D00A)
+指定されたトランザクション コーディネーターに、新規トランザクションを参加できませんでした。

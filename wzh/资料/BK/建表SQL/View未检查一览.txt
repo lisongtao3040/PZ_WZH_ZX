@@ -1,0 +1,7 @@
+SELECT   '未检查' AS 状态, PlanFlag, cd, no, shunwei, suu, jxs_name, line_cd, yotei_chk_date, h, w, dh, dw, sw, kw, b2bOderNo, 
+                b2bIndexNo, BianPlanID
+FROM      dbo.t_check_plan AS a
+WHERE   (NOT EXISTS
+                    (SELECT   1 AS Expr1
+                     FROM      dbo.t_check AS b
+                     WHERE   (a.cd = cd) AND (a.no = no) AND (a.yotei_chk_date = yotei_chk_date)))

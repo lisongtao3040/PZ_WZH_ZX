@@ -1,0 +1,47 @@
+/****** SSMS の SelectTopNRows コマンドのスクリプト  ******/
+SELECT top 1
+	  --a.[guid]
+	  --,ROW_NUMBER() OVER (PARTITION BY a.[CD] ,a.[specialBookNo],a.[sapOderNo],a.[sapIndexNo]
+			--			  ORDER BY a.[ins_date]
+	  
+	  --) AS RowNumber
+      a.[CD]
+	  ,'' as [no]
+      --,a.[amount]
+      ,a.[specialBookNo]
+      ,a.[sapOderNo]
+      ,a.[sapIndexNo]
+      ,a.[DealerAbbreviation]
+      ,b.[line_cd]
+      ,a.[mark]
+      --,a.[ins_sya]
+      ,a.[ins_date]
+      --,a.[upd_sya]
+      --,a.[upd_date]
+  FROM [wzh_new].[dbo].[m_bl_manage] a
+  INNER JOIN t_check_plan b
+  ON (
+			(a.specialBookNo = b.specialBookNo AND ISNULL(a.specialBookNo,'')<>'')
+		OR  (a.sapOderNo = b.sapOderNo AND a.sapIndexNo = b.sapIndexNo AND ISNULL(a.specialBookNo,'') = '')
+		)
+	AND a.line_cd = b.line_cd
+
+UNION ALL
+	SELECT TOP 1 
+			--	 [ck_id]
+			a.[cd]
+			,a.[no]
+
+			,a.[specialBookNo]
+			,a.[sapOderNo]
+			,a.[sapIndexNo]
+			,b.jxs_name
+			,b.[line_cd]
+
+			,''
+						,b.yotei_chk_date
+	  FROM [t_check] a
+	  INNER JOIN t_check_plan b
+	  ON a.no = b.no
+	  AND a.line_cd = b.line_cd
+WHERE a.result = 'NG'

@@ -1,0 +1,8 @@
+
+  update [wzh].[dbo].[TCM_BianPlan] set plandate = '2021-06-14'
+  Where plandate = '2021-06-11'
+
+
+delete from [wzh].[dbo].[t_check]
+
+delete from [wzh].[dbo].[t_check_ms]
