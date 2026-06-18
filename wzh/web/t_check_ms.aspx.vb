@@ -51,6 +51,10 @@ Partial Class t_check_ms
 
             '设置 GV H W KW... 信息
             Dim dtChk As DataTable = DA.GetCheckOne(CLoginInfo.ck_id)
+
+            '拍照追加
+            hidQR1.Value = CLoginInfo.ck_id
+
             If dtChk.Rows.Count > 0 Then
                 Me.hid_jxs_name.Value = dtChk.Rows(0).Item("jxs_name").ToString
             End If

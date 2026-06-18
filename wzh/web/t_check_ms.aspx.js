@@ -81,6 +81,24 @@ function DateDiff(date1, date2) {
 
 $(document).ready(function () {
 
+    var correctLevel = QRCode.CorrectLevel.L;
+    if ($("#hidQR1").val() != '') {
+        document.getElementById("QR1").innerHTML = "";
+        try {
+            var qrcode = new QRCode(document.getElementById("QR1"), {
+                text: $("#hidQR1").val(),
+                width: 200,
+                height: 200,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: correctLevel
+            });
+        } catch (e1) { }
+    }
+
+
+
+
     var that = this;
     this.cd = $("#tbxCd").text();
     this.no = $("#tbxNo").text();

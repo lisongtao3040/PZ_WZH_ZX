@@ -29,6 +29,9 @@
 
 <%--    <link href='./t_check_ms.aspx.css?randomId=<%=PageCom.GetYmdhmsf()%>'  rel="stylesheet" />--%>
     <script type="text/javascript" src="./t_check_ms.aspx.js?randomId=<%=PageCom.GetYmdhmsf()%>"></script>
+
+    <script type="text/javascript" src="./Js/Qrcode.js"></script>
+
 </head>
 <body>
     <form id="form1" runat="server">
@@ -237,7 +240,14 @@
  
         <footer>
         </footer>
-                <asp:HiddenField ID="hid_jxs_name" runat="server" />
+
+        <asp:HiddenField ID="hid_jxs_name" runat="server" />
+        <asp:HiddenField ID="hidQR1" runat="server" />
+        <div style="margin:25px;">
+            <div id="QR1" class="QRDIV"></div>
+        </div>
+
+        <br /><br />
     </form>
 </body>
 </html>

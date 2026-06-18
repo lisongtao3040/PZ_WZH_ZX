@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "web(1)", "http://localhost:19881", "{6A0A577E-2382-4B0F-B8EC-9880F84E778F}"
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "web", "http://localhost:19881", "{6A0A577E-2382-4B0F-B8EC-9880F84E778F}"
 	ProjectSection(WebsiteProperties) = preProject
 		UseIISExpress = "true"
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5"
@@ -61,6 +61,27 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "zyUpload", "..\zyUpload\", 
 	EndProjectSection
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BackUpToXlS", "..\Back_Up_ToXlS\BackUpToXlS.vbproj", "{73D52902-29CF-4449-AF48-A3B33EBEC724}"
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "PCWeb", "..\PCWeb\", "{9F440EA4-A1D4-446B-9BDB-2C3AA0CF7CE9}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5.2"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_50106"
+		Debug.AspNetCompiler.PhysicalPath = "..\PCWeb\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_50106\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_50106"
+		Release.AspNetCompiler.PhysicalPath = "..\PCWeb\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_50106\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "50106"
+		SlnRelativePath = "..\PCWeb\"
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -158,6 +179,22 @@ Global
 		{73D52902-29CF-4449-AF48-A3B33EBEC724}.Release|x64.Build.0 = Release|Any CPU
 		{73D52902-29CF-4449-AF48-A3B33EBEC724}.Release|x86.ActiveCfg = Release|Any CPU
 		{73D52902-29CF-4449-AF48-A3B33EBEC724}.Release|x86.Build.0 = Release|Any CPU
+		{9F440EA4-A1D4-446B-9BDB-2C3AA0CF7CE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F440EA4-A1D4-446B-9BDB-2C3AA0CF7CE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F440EA4-A1D4-446B-9BDB-2C3AA0CF7CE9}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{9F440EA4-A1D4-446B-9BDB-2C3AA0CF7CE9}.Debug|ARM.Build.0 = Debug|Any CPU
+		{9F440EA4-A1D4-446B-9BDB-2C3AA0CF7CE9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9F440EA4-A1D4-446B-9BDB-2C3AA0CF7CE9}.Debug|x64.Build.0 = Debug|Any CPU
+		{9F440EA4-A1D4-446B-9BDB-2C3AA0CF7CE9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9F440EA4-A1D4-446B-9BDB-2C3AA0CF7CE9}.Debug|x86.Build.0 = Debug|Any CPU
+		{9F440EA4-A1D4-446B-9BDB-2C3AA0CF7CE9}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F440EA4-A1D4-446B-9BDB-2C3AA0CF7CE9}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{9F440EA4-A1D4-446B-9BDB-2C3AA0CF7CE9}.Release|ARM.ActiveCfg = Debug|Any CPU
+		{9F440EA4-A1D4-446B-9BDB-2C3AA0CF7CE9}.Release|ARM.Build.0 = Debug|Any CPU
+		{9F440EA4-A1D4-446B-9BDB-2C3AA0CF7CE9}.Release|x64.ActiveCfg = Debug|Any CPU
+		{9F440EA4-A1D4-446B-9BDB-2C3AA0CF7CE9}.Release|x64.Build.0 = Debug|Any CPU
+		{9F440EA4-A1D4-446B-9BDB-2C3AA0CF7CE9}.Release|x86.ActiveCfg = Debug|Any CPU
+		{9F440EA4-A1D4-446B-9BDB-2C3AA0CF7CE9}.Release|x86.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
