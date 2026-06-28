@@ -2,6 +2,7 @@
 Imports System.Data
 Imports System.IO
 Imports Newtonsoft.Json.Linq
+Imports System.Web.Services
 
 Partial Class t_check_ms
 
@@ -135,6 +136,8 @@ Partial Class t_check_ms
         End If
 
         PicMSInit()
+
+        'LoadAndDisplayImages()
 
     End Sub
 
@@ -593,6 +596,92 @@ Partial Class t_check_ms
 
 
     End Sub
+
+    '''' <summary>
+    '''' 遍历文件夹并将图片转为Base64绑定到前端
+    '''' </summary>
+    'Private Sub LoadAndDisplayImages()
+    '    Dim targetFolder As String = "F:\WebShare\WzhChkImg\" & CLoginInfo.ck_id
+
+    '    ' 检查文件夹是否存在，防止报错
+    '    If Not Directory.Exists(targetFolder) Then
+    '        ' 可以根据需要记录日志或提示用户
+    '        'Response.Write("错误：文件夹不存在！")
+    '        Exit Sub
+    '    End If
+
+    '    ' 创建一个 DataTable 用于存储图片数据并绑定到前端
+    '    Dim dt As New DataTable()
+    '    dt.Columns.Add("FileName", GetType(String))
+    '    dt.Columns.Add("Base64String", GetType(String))
+
+    '    ' 支持的图片扩展名
+    '    Dim allowedExtensions As New List(Of String) From {".jpg", ".jpeg", ".png", ".gif", ".bmp"}
+
+    '    Try
+    '        ' 获取文件夹下的所有文件
+    '        Dim files As String() = Directory.GetFiles(targetFolder)
+
+    '        For Each filePath As String In files
+    '            Dim extension As String = Path.GetExtension(filePath).ToLower()
+
+    '            ' 只处理图片文件
+    '            If allowedExtensions.Contains(extension) Then
+    '                Dim fileName As String = Path.GetFileName(filePath)
+
+    '                ' 调用函数将图片转为 Base64
+    '                Dim base64Str As String = ConvertImageToBase64(filePath, extension)
+
+    '                ' 将数据存入 DataTable
+    '                Dim dr As DataRow = dt.NewRow()
+    '                dr("FileName") = fileName
+    '                dr("Base64String") = base64Str
+    '                dt.Rows.Add(dr)
+    '            End If
+    '        Next
+
+    '        ' 绑定到 Repeater 控件
+    '        rptImages.DataSource = dt
+    '        rptImages.DataBind()
+
+    '    Catch ex As Exception
+    '        Response.Write("读取图片发生异常: " & ex.Message)
+    '    End Try
+    'End Sub
+
+    ''' <summary>
+    ''' 将单张图片文件转换为前端可识别的 Base64 字符串
+    ''' </summary>
+    Private Function ConvertImageToBase64(ByVal filePath As String, ByVal extension As String) As String
+        Dim base64String As String = ""
+
+        Try
+            ' 读取图片文件的所有字节
+            Dim imageBytes As Byte() = File.ReadAllBytes(filePath)
+
+            ' 转换为 Base64 编码
+            Dim base64Data As String = Convert.ToBase64String(imageBytes)
+
+            ' 根据扩展名转换媒体类型(MIME Type)，如果是 .jpg 需要转为 jpeg
+            Dim mimeType As String = extension.Replace(".", "")
+            If mimeType = "jpg" Then mimeType = "jpeg"
+
+            ' 拼接成前端 img 标签可以直接读取的 Data URL 格式
+            base64String = String.Format("data:image/{0};base64,{1}", mimeType, base64Data)
+
+        Catch ex As Exception
+            ' 单张图片转换失败时跳过或返回空
+            base64String = ""
+        End Try
+
+        Return base64String
+    End Function
+
+
+
+
+
+
     Public Sub btClick(ByVal sender As Object, ByVal e As EventArgs)
         Dim btn As Button
         btn = CType(sender, Button)

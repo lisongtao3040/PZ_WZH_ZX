@@ -39,7 +39,7 @@
                     if (!file) return;
 
                     var sessionId = getQueryString("sid");
-                    var myId = "A001"; // 💡 这里放你要决定的文件名 ID（可以从页面元素获取，或者从 URL 获取）
+                    var myId = getQueryString("no"); // 💡 这里放你要决定的文件名 ID（可以从页面元素获取，或者从 URL 获取）
 
                     // 打包数据
                     var formData = new FormData();

@@ -46,7 +46,9 @@ Public Class Phone
             End If
 
             ' 3. 设定 D 盘保存路径
-            Dim targetFolder As String = "D:\phone\"
+            Dim targetFolder As String = "F:\WebShare\WzhChkImg\"
+
+            targetFolder = targetFolder & id & "\"
 
             ' 如果 D 盘没有 phone 文件夹，则自动创建
             If Not Directory.Exists(targetFolder) Then
@@ -61,7 +63,7 @@ Public Class Phone
 
             ' 5. 【核心】根据传过来的 ID 决定文件名
             ' 拼接出来的路径类似：D:\phone\12345.jpg
-            Dim fullPath As String = Path.Combine(targetFolder, id & extension)
+            Dim fullPath As String = Path.Combine(targetFolder, Now.ToString("yyyyMMddHHmmssfff") & extension)
 
             ' 6. 将图片保存到 D 盘
             photo.SaveAs(fullPath)
@@ -78,7 +80,7 @@ Public Class Phone
             ' -------------------------------------------------------------
 
             ' 返回成功信息
-            WriteJsonResponse(response, True, "图片已成功保存到D盘，文件名：" & id & extension)
+            WriteJsonResponse(response, True, "图片已成功保存到WzhChkImg，文件名：" & id & extension)
 
         Catch ex As Exception
             WriteJsonResponse(response, False, "服务器错误: " & ex.Message)
@@ -91,5 +93,96 @@ Public Class Phone
         Dim json As String = "{""success"":" & success.ToString().ToLower() & ",""message"":""" & message & """}"
         response.Write(json)
     End Sub
+
+
+    ''' <summary>
+    ''' 被 JS 调用的 WebMethod，返回图片的 Base64 列表
+    ''' </summary>
+
+    <WebMethod(Description:="获得手机上传的图片到")>
+    <ScriptMethod(ResponseFormat:=ResponseFormat.Json)>
+    Public Function GetImagesBase64(ByVal ck_id As String) As Object
+        Dim targetFolder As String = "F:\WebShare\WzhChkImg\" & ck_id
+
+        Dim imageList As New List(Of Dictionary(Of String, String))()
+
+        If Not Directory.Exists(targetFolder) Then
+            Return New With {Key .success = False, Key .message = "F:\WebShare\WzhChkImg\" & ck_id & "文件夹不存在"}
+        End If
+
+        Dim allowedExtensions As New List(Of String) From {".jpg", ".jpeg", ".png", ".gif", ".bmp"}
+
+        Try
+            Dim files As String() = Directory.GetFiles(targetFolder)
+            For Each filePath As String In files
+                Dim extension As String = Path.GetExtension(filePath).ToLower()
+
+                If allowedExtensions.Contains(extension) Then
+                    Dim fileName As String = Path.GetFileName(filePath)
+
+                    ' 读取并转为 Base64
+                    Dim imageBytes As Byte() = File.ReadAllBytes(filePath)
+                    Dim base64Data As String = Convert.ToBase64String(imageBytes)
+
+                    Dim mimeType As String = extension.Replace(".", "")
+                    If mimeType = "jpg" Then mimeType = "jpeg"
+                    Dim base64Str As String = String.Format("data:image/{0};base64,{1}", mimeType, base64Data)
+
+                    ' 存入字典
+                    Dim imgData As New Dictionary(Of String, String)()
+                    imgData.Add("fileName", fileName)
+                    imgData.Add("base64", base64Str)
+                    imageList.Add(imgData)
+                End If
+            Next
+
+            Return New With {Key .success = True, Key .data = imageList}
+
+        Catch ex As Exception
+            Return New With {Key .success = False, Key .message = ex.Message}
+        End Try
+    End Function
+
+
+
+    ''' <summary>
+    ''' 被 JS 调用的 WebMethod，返回图片的 Base64 列表
+    ''' </summary>
+
+    <WebMethod(Description:="获得手机上传的图片到")>
+    <ScriptMethod(ResponseFormat:=ResponseFormat.Json)>
+    Public Function DelImg(ByVal ck_id As String, ByVal delFilename As String) As Object
+        Dim targetFolder As String = "F:\WebShare\WzhChkImg\" & ck_id
+
+        Dim imageList As New List(Of Dictionary(Of String, String))()
+
+        If Not Directory.Exists(targetFolder) Then
+            Return New With {Key .success = False, Key .message = "F:\WebShare\WzhChkImg\" & ck_id & "文件夹不存在"}
+        End If
+
+        Dim allowedExtensions As New List(Of String) From {".jpg", ".jpeg", ".png", ".gif", ".bmp"}
+
+        Try
+            Dim files As String() = Directory.GetFiles(targetFolder)
+            For Each filePath As String In files
+                Dim extension As String = Path.GetExtension(filePath).ToLower()
+
+                If allowedExtensions.Contains(extension) Then
+                    Dim fileName As String = Path.GetFileName(filePath)
+
+                    If fileName = delFilename Then
+                        System.IO.File.Delete(filePath)
+
+                        Return New With {Key .success = True, Key .message = "删除成功"}
+                    End If
+                End If
+            Next
+
+            Return New With {Key .success = True, Key .message = "没找到文件"}
+
+        Catch ex As Exception
+            Return New With {Key .success = False, Key .message = ex.Message}
+        End Try
+    End Function
 
 End Class

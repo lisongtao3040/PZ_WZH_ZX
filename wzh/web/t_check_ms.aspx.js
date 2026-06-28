@@ -86,7 +86,7 @@ $(document).ready(function () {
         document.getElementById("QR1").innerHTML = "";
         try {
             var qrcode = new QRCode(document.getElementById("QR1"), {
-                text: $("#hidQR1").val(),
+                text:"http://10.160.192.131/Wzh2023/Snap.aspx?no="+ $("#hidQR1").val(),
                 width: 200,
                 height: 200,
                 colorDark: "#000000",
