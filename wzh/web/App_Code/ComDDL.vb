@@ -547,4 +547,59 @@ Public Class ComDDL
         End If
 
     End Function
+
+
+    Public Shared Function Se1_ChkingData() As DataTable
+
+        Dim sb As New StringBuilder()
+        sb.AppendLine("WITH CTE AS (")
+        sb.AppendLine("    SELECT")
+        sb.AppendLine("        ck_id")
+        sb.AppendLine("        ,REPLACE(cd, '-', '') AS cd")
+        sb.AppendLine("        ,no")
+        sb.AppendLine("        ,department_cd")
+        sb.AppendLine("        ,line_cd")
+        sb.AppendLine("        ,chk_user")
+        sb.AppendLine("        ,CONVERT(varchar(23), yotei_chk_date, 121) AS yotei_chk_date")
+        sb.AppendLine("        ,CONVERT(varchar(23), chk_start_date, 121) AS chk_start_date")
+        sb.AppendLine("        ,CONVERT(varchar(23), chk_end_date, 121) AS chk_end_date")
+        sb.AppendLine("        ,status")
+        sb.AppendLine("        ,result")
+        sb.AppendLine("        ,chk_times")
+        sb.AppendLine("        ,suu")
+        sb.AppendLine("        ,del_flg")
+        sb.AppendLine("        ,qianpin")
+        sb.AppendLine("        ,tools_scan_flg")
+        sb.AppendLine("        ,shared_ck_id")
+        sb.AppendLine("        ,h")
+        sb.AppendLine("        ,w")
+        sb.AppendLine("        ,dh")
+        sb.AppendLine("        ,dw")
+        sb.AppendLine("        ,sw")
+        sb.AppendLine("        ,kw")
+        sb.AppendLine("        ,specialBookNo")
+        sb.AppendLine("        ,b2bOderNo")
+        sb.AppendLine("        ,b2bIndexNo")
+        sb.AppendLine("        ,sapOderNo")
+        sb.AppendLine("        ,sapIndexNo")
+        sb.AppendLine("        ,edit_user")
+        sb.AppendLine("        ,upd_user")
+        sb.AppendLine("        ,CONVERT(varchar(23), upd_date, 121) AS upd_date")
+        sb.AppendLine("        ,ins_user")
+        sb.AppendLine("        ,CONVERT(varchar(23), ins_date, 121) AS ins_date")
+        sb.AppendLine("        ,ROW_NUMBER() OVER(PARTITION BY REPLACE(cd, '-', ''), no ORDER BY ck_id DESC) AS rn")
+        sb.AppendLine("    FROM t_check")
+        sb.AppendLine("    WHERE [status] = '0' AND [result] = '待'")
+        sb.AppendLine(")")
+        sb.AppendLine("SELECT * FROM CTE WHERE rn = 1")
+        sb.AppendLine("ORDER BY no")
+
+        'バラメタ格納
+        Dim paramList As New List(Of SqlParameter)
+
+        Dim dsInfo As New Data.DataSet
+        FillDataset(DataAccessManager.ConnPlan, CommandType.Text, sb.ToString(), dsInfo, "Se1_ChkingData", paramList.ToArray)
+        Return dsInfo.Tables(0)
+
+    End Function
 End Class
