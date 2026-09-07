@@ -68,8 +68,21 @@ Partial Class t_check_list
             cb2.Checked = CLoginInfo.cb2
             cb3.Checked = CLoginInfo.cb3
             cb4.Checked = CLoginInfo.cb4
-            '加载一览
-            InitMs(True, CLoginInfo.tpNos)
+
+            '来自满托盘一览时，填入 CD 和 No（覆盖上方的清空）
+            Dim _ftlCd As String = If(Request.QueryString("cd"), "").Trim
+            Dim _ftlNo As String = If(Request.QueryString("no"), "").Trim
+            If _ftlCd <> "" Then Me.tbxCd.Text = _ftlCd
+            If _ftlNo <> "" Then Me.tbxNo.Text = _ftlNo
+
+            '加载一览（来自满托盘一览时不带托盘号，按 CD/No 检索）
+            Dim _tpNos As String = If(_ftlCd <> "", "", CLoginInfo.tpNos)
+            InitMs(True, _tpNos)
+
+            '自动新规检查（来自满托盘一览的检查按钮）
+            If Request.QueryString("autoNewChk") = "1" AndAlso Me.btnNewChk.Enabled Then
+                btnNewChk_Click(Nothing, Nothing)
+            End If
 
         End If
         '重新加载部门选择Checkbox
@@ -830,5 +843,9 @@ Partial Class t_check_list
 
     Protected Sub btnBack2_Click(sender As Object, e As EventArgs) Handles btnBack2.Click
         Server.Transfer("default.aspx")
+    End Sub
+    Protected Sub btnFullTrayList_Click(sender As Object, e As EventArgs) Handles btnFullTrayList.Click
+        PageCom.SetInitParam(Page, Context, ViewState, CLoginInfo)
+        Server.Transfer("t_FullTrayList.aspx")
     End Sub
 End Class

@@ -23,3 +23,22 @@
 3.每行追加 检查按钮（点击的函数 空着就行，我自己填写）
 
 
+一览用的SQL是
+    SELECT
+    [innerCodeDes]
+        ,[stationNo]
+        ,[stationUse]
+        ,[trayNo]
+        ,[Ttxt]
+        ,[OrderNo]
+        ,[sapCode]
+        ,[packageAmount]
+        ,[destination]
+        ,[jizhong]
+        ,[lineCodeShort]
+    FROM [10.160.192.127].[scgl_PeiSong].[dbo].[v_TwoMetresFullTrayDetail]
+
+
+不要修改寄存的代码文件，尽量都新规文件。代码写法参照寄存。
+不需要你测试，创建完成告诉我就可以。
+最后总结创建文件的列表

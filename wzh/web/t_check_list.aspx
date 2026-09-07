@@ -41,6 +41,9 @@
 
             <input type="button" id="btnScsj" class=""  value="实际" />
             <input type="button" id="btnBuliang" class=""  value="不良" />
+           <%-- <input type="button" id="btnFullTrayList" value="满托盘" onclick="location.href='t_FullTrayList.aspx';" style="background:#d0e8ff;" />--%>
+
+                        <asp:Button ID="btnFullTrayList" runat="server" Text="托盘list" />
             <asp:Button ID="btnInputByHand" runat="server" Text="手" />
             <asp:Button ID="btnBack" runat="server" Text="返回" />
              <asp:Button ID="btnBack2" runat="server" Text="返回" />

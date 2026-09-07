@@ -1,0 +1,91 @@
+﻿.top_button_panel {
+    min-width: 800px;
+    background-color: #efefef;
+}
+
+    /*.top_button_panel input[type='text'] {
+        width: 320px;
+        height: 30px;
+        text-align: center;
+    }*/
+
+    .top_button_panel input[type='button'], .top_button_panel input[type='submit'] {
+        margin: 8px 4px 8px 4px;
+        padding: 2px 4px 2px 4px;
+        text-align: center;
+    }
+
+.edit_link {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+
+
+
+
+.gvtitle td {
+    border-left: solid 1px #000;
+    border-top: solid 1px #000;
+    border-bottom: solid 1px #000;
+    font-weight: bold;
+    text-align: center;
+        padding-left:1px;
+}
+
+
+
+.gv td {
+    /*line-height: 26px;*/
+    padding-bottom: 2px;
+    padding-top: 2px;
+    vertical-align:top;
+    text-align:left;
+    padding-left:1px;
+    word-break:break-all;
+}
+
+    .gv td:nth-child(1), .c1 {
+        width: 145px;
+    }
+
+    .gv td:nth-child(2), .c2 {
+        width: 85px;
+        text-align:center;
+    }
+
+    .gv td:nth-child(3), .c3 {
+        width: 50px;
+        text-align:center;
+    }
+
+    .gv td:nth-child(4), .c4 {
+        width: 110px;
+        text-align:center;
+    }
+
+    .gv td:nth-child(5), .c5 {
+        width: 140px;
+    }
+
+    .gv td:nth-child(6), .c6 {
+        width: 210px;
+    }
+
+    .gv td:nth-child(7) {
+    
+    }
+
+.test {
+    background-color: #edeb8c;
+}
+
+.PGvZen {
+    overflow: auto;
+    background-color: #eba8a8;
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    border: 5px solid blue;
+}

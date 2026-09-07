@@ -1,0 +1,31 @@
+﻿.menu_button {
+    margin: 10px auto 10px auto;
+    width: 320px;
+}
+
+.light_yellow{
+    background-color:#f6f0cf;
+}
+
+.light_blue{
+    background-color:#bddef5 ;
+}
+
+.light_green{
+    background-color:#b6ff00  ;
+}
+
+.NavajoWhite{
+    background-color:NavajoWhite ;
+}
+
+.Orange{
+    background-color:Orange ;
+}
+
+hr{
+    border:1px thin #ccc;
+       
+}
+
+ 

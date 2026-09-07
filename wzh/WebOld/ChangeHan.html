@@ -1,0 +1,112 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <meta charset="utf-8" />
+    <script type="text/javascript" src="./jquery/jquery-3.6.0.min.js"></script>
+    <script>
+        
+
+        $(document).ready(function () {
+            $("#tbxYuan").bind("input propertychange", function () {
+
+                $("#tbxSen").text(ChangeHan($("#tbxYuan").val()));
+
+                var tm;
+                tm = GetFormulaChkStr($("#tbxSen").val());
+
+                if (tm == true) {
+                    $("#gs").text('是公式');
+                    $("#gs").css('color', 'green');
+                } else if (tm == false) {
+                    $("#gs").text('是公式');
+                    $("#gs").css('color', 'green');
+                } else {
+
+                    $("#gs").text('不是公式');
+                    $("#gs").css('color', 'red');
+                }               
+            });
+        });
+
+        function replaceFullToHalf(str) {
+            return str.replace(/[！-～]/g, function (s) {
+                return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
+            });
+        }
+
+        function ChangeHan(str) {
+            if (str.length <= 0) { return false; }
+            var result;
+            result = "";
+            var code;
+            for (var i = 0; i < str.length; i++) {
+                code = str.charCodeAt(i);
+                if (code >= 65281 && code <= 65373)//在这个unicode编码范围中的是所有的英文字母已经各种字符
+                {
+                    var d = str.charCodeAt(i) - 65248;
+                    result += String.fromCharCode(d);//把全角字符的unicode编码转换为对应半角字符的unicode码
+                }
+                else if (code == 12288)//空格
+                {
+                    var d = str.charCodeAt(i) - 12288 + 32;
+                    result += String.fromCharCode(d);
+                }
+                else {
+                    result += str.charAt(i);
+                }
+            }
+            //return result;
+            return result.replace(/”/g, "\"")
+           .replace(/’/g, "'")
+           .replace(/‘/g, "`")
+           .replace(/￥/g, "\\")
+           .replace(/　/g, " ")
+                .replace(/”/g, "\"")
+                .replace(/“/g, "\"")
+           .replace(/〜/g, "~");
+        }
+
+        function GetFormulaChkStr(str) {
+
+            if (str == undefined) {
+                return "";
+            }
+
+            var gv = $(".gv");
+            str = str.replace(/\{h\}/g, "100");
+            str = str.replace(/\{w\}/g, "100");
+            str = str.replace(/\{dh\}/g, "100");
+            str = str.replace(/\{dw\}/g, "100");
+            str = str.replace(/\{sw\}/g, "100");
+            str = str.replace(/\{kw\}/g, "100");
+            str = str.replace(/\{in1\}/g, "100");
+
+            var reg = new RegExp("[a-zA-Z]");
+
+            if (reg.test(str)) {
+                return str;
+            } else {
+                if (str == "") {
+                    return "";
+                } else {
+                    return eval(str);
+                }
+
+            }
+
+        }
+        </script>
+</head>
+<body>
+    <h1>全角转换半角</h1>
+    <hr />
+    <textarea id="tbxYuan" rows="10" cols="200"></textarea>
+    <hr />
+    <textarea id="tbxSen" rows="10" cols="200"></textarea>
+
+    <hr />
+    <a id="gs"></a>
+</body>
+</html>
