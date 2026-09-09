@@ -1,1 +1,0 @@
-<%@ WebService Language="VB" CodeBehind="~/App_Code/CheckApi.vb" Class="CheckApi" %>

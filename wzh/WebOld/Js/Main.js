@@ -1,6 +1,5 @@
 ﻿//尺寸设定
 function SizeInit() {
-    $("#dialog_pd").height($(window).height());
     $("#cover").height($(window).height());
 }
 function CoverIt() {
@@ -33,74 +32,7 @@ $(document).ready(function () {
 
     }
 
-    //var allIlikeTextBoxCheckResult = true;
 
-    ////检查属性是否输入
-    //$(".Ilike_TextBox").each(function () {
-    //    var InputType = $(this).attr("InputType");
-    //    var msg = "";
-    //    if (InputType == undefined || InputType == '') {
-    //        msg = $(".Ilike_TextBox").attr("id") + "的 InputType 未输入";
-    //     }
-    //    if (msg != '') {
-    //        $(this).css("background", "red");
-    //        alert(msg);
-    //        allIlikeTextBoxCheckResult = false;
-    //        return false;
-    //    } else {
-    //        return true;
-    //    }
-    //});
-
-    //if (allIlikeTextBoxCheckResult) {
-
-
-    /*失去焦点检查*/
-    $(".Ilike_TextBox").blur(function () {
-        var that = $(this);
-        if ($(this).val() == "") {
-            return true;
-        }
-
-        var InputType = $(this).attr("InputType");
-
-        if (InputType == undefined) {
-            alert($(this).attr("id") + "的 InputType 未输入");
-
-        } else if (InputType == "Normal") {
-
-        } else if (InputType == "Number") {
-            if (!chkHankakuSuuji($(this).val())) {
-                alert2("【" + $(this).attr("InputName") + "】- 请输入半角数字！", function () { that.focus(); });
-                thatResult = false;
-                return false;// break
-            }
-
-        } else if (InputType == "English") {
-            if (!chkHankakuEi($(this).val())) {
-                alert2("【" + $(this).attr("InputName") + "】- 请输入半角英字！", function () { that.focus(); });
-                thatResult = false;
-                return false;// break
-            }
-
-        } else if (InputType == "EnglishNumber") {
-            if (!chkHankakuEisuuji($(this).val())) {
-                alert2("【" + $(this).attr("InputName") + "】- 请输入半角英数字！", function () { that.focus(); });
-                thatResult = false;
-                return false;// break
-            }
-
-        }
-
-        return true;
-
-    });
-
-    /*失去焦点检查*/
-    $(".Ilike_TextBox").change(function () {
-        //必须入力检查
-        return InputMustInput(this);
-    });
 
     $("form").submit(function (e) {
 
@@ -113,14 +45,7 @@ $(document).ready(function () {
 
 });
 
-function CheckAllInput() {
-    var rtv = true;
-    $(".Ilike_TextBox").each(function () {
-        //必须入力检查
-        if (!InputMustInput(this)) { rtv = false; return false; }
-    });
-    return rtv;
-}
+
 
 //输入框 必须入力检查
 function InputMustInput(e) {
@@ -146,47 +71,61 @@ $(window).resize(function () {
 });
 
 
-/*自定义消息对话框*/
-function alert2(msg, okfnc, errType,text_color) {
-    //.ui-dialog-title
-    $("#dialog_pd").show();
-    //❌	‼	⁉	❗ ❓
-    if (errType == undefined) {
-        errType = "○";
+/*自定义消息对话框（动态生成HTML，不依赖页面上的 #dialog/#dialogMsg）*/
+function alert2(msg, okfnc, errType, text_color) {
+    //❌ ‼ ⁉ ❗ ❓
+    var type = (errType == undefined) ? "○" : errType;
+
+    //errType → 主题色 + 副标题
+    var theme = {
+        "○": { color: "#095074", text: "Information" },
+        "❌": { color: "#e74c3c", text: "Error" },
+        "‼": { color: "#e67e22", text: "Warning" },
+        "❗": { color: "#e67e22", text: "Warning" },
+        "⁉": { color: "#e67e22", text: "Warning" },
+        "❓": { color: "#095074", text: "Confirm" },
+        "?": { color: "#095074", text: "Confirm" }
+    };
+    var s = theme[type] || { color: "#095074", text: "Information" };
+
+    //先移除上次弹窗，避免叠加残留
+    $(".jq-alert-layer").remove();
+
+    var msgColor = (text_color == undefined) ? "#333" : text_color;
+
+    var html = ""
+        + '<div class="jq-alert-layer" style="position:fixed;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.45);z-index:999999;display:flex;align-items:center;justify-content:center;">'
+        +   '<div style="width:420px;max-width:92%;background:#fff;border-radius:12px;box-shadow:0 15px 50px rgba(0,0,0,0.35);overflow:hidden;animation:jqAlertIn 0.2s ease-out;font-family:Meiryo,\'Microsoft YaHei\',sans-serif;">'
+        +       '<div style="height:6px;background:' + s.color + ';"></div>'
+        +       '<div style="text-align:center;padding:24px 24px 0 24px;">'
+        +           '<div style="font-size:48px;line-height:1.3;">' + type + '</div>'
+        +           '<div style="color:' + s.color + ';font-size:15px;letter-spacing:2px;margin-top:2px;">' + s.text + '</div>'
+        +       '</div>'
+        +       '<div style="padding:14px 28px 8px 28px;text-align:center;font-size:22px;font-weight:bold;line-height:1.6;word-break:break-all;color:' + msgColor + ';">' + msg + '</div>'
+        +       '<div style="text-align:center;padding:16px 24px 26px 24px;">'
+        +           '<button type="button" style="width:170px;height:44px;background:' + s.color + ';color:#fff;font-size:20px;font-weight:bold;border:none;border-radius:6px;cursor:pointer;box-shadow:0 3px 8px rgba(0,0,0,0.2);">OK</button>'
+        +       '</div>'
+        +   '</div>'
+        + '</div>';
+
+    var $layer = $(html).appendTo(document.body);
+
+    //弹出动画关键帧（只注入一次）
+    if ($("#jqAlertCss").length == 0) {
+        $("<style id='jqAlertCss'>@keyframes jqAlertIn{from{transform:scale(0.85);opacity:0;}to{transform:scale(1);opacity:1;}}</style>").appendTo("head");
     }
 
-
-
-
-    $("#dialog").attr("title","" + errType + " Infomation");
-    $("#dialogMsg").html(msg);
-
-    $("#dialog").dialog({
-        dialogClass: "no-close",
-        width: $(window).width() * 0.6,
-        height: $(window).height() * 0.6,
-        buttons: [
-          {
-              text: "OK",
-              click: function () {
-                  $(this).dialog("close");
-                  $("#dialog_pd").hide();
-                  if (okfnc == undefined) {
-
-                  } else {
-                      setTimeout(function () { okfnc(); }, 0);
-                  }
-                  
-
-              }
-          }
-        ]
+    //OK 关闭
+    $layer.find("button").click(function () {
+        $layer.fadeOut(120, function () {
+            $layer.remove();
+            if (okfnc != undefined) {
+                setTimeout(function () { okfnc(); }, 0);
+            }
+        });
     });
 
-    $("#dialogMsg").css("color", text_color);
-    $("#ui-id-1").css("color", text_color);
-
-    $(".ui-dialog").css("zIndex", "99999");
+    $layer.find("button").focus();
 }
 
 /**
@@ -261,24 +200,7 @@ function chkHankakuSuuji(str) {
         return true;
     }
 
-    //return isNumber(str);
 }
-
-///**
-//* 校验只要是数字（包含正负整数，0以及正负浮点数）就返回true
-//**/
-
-//function isNumber(val) {
-
-//    var regPos = /^\d+(\.\d+)?$/; //非负浮点数
-//    var regNeg = /^(-(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*)))$/; //负浮点数
-//    if (regPos.test(val) && regNeg.test(val)) {
-//        return true;
-//    } else {
-//        return false;
-//    }
-
-//}
 
 function jqFanYe(idx)
 {
