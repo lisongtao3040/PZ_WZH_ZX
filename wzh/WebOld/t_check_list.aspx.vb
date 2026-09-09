@@ -32,13 +32,13 @@ Partial Class t_check_list
             '加载日内列表
             HiListInit(Me.ddlHiinai)
 
+            '基本信息设定
             If CLoginInfo.cd <> "" Then
                 Me.tbxCd.Text = CLoginInfo.cd
             End If
             If CLoginInfo.no <> "" Then
                 Me.tbxNo.Text = CLoginInfo.no
             End If
-
             If CLoginInfo.TpNo <> "" Then
                 Me.tbxTpNo.Text = CLoginInfo.TpNo
             End If
