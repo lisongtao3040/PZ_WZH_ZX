@@ -701,11 +701,8 @@ Partial Class t_check_list
             sb.Append("<a class="""" >")
             sb.Append(cd & "<br>" & no)
             sb.Append("</a>")
-
-
-
         Else
-            If status <> "4" Then
+            If status <> "4" And status <> "5" Then
                 sb.Append("<a class=""edit_link"" onclick=""Edit('" & ck_id & "')"">")
                 sb.Append(cd & "<br>" & no & "<br>" & ck_id)
                 sb.Append("</a>")
@@ -744,6 +741,8 @@ Partial Class t_check_list
             sb.Append("继承")
         ElseIf status = "4" Then
             sb.Append("手入力")
+        ElseIf status = "5" Then
+            sb.Append("自动OK")
         End If
 
 
@@ -829,5 +828,31 @@ Partial Class t_check_list
     Private Sub btnLst_Click(sender As Object, e As EventArgs) Handles btnLst.Click
         PageCom.SetInitParam(Page, Context, ViewState, CLoginInfo)
         Server.Transfer("t_FullTrayList.aspx")
+    End Sub
+
+    Private Sub btnAutoOK_Click(sender As Object, e As EventArgs) Handles btnAutoOK.Click
+
+        Dim ck_id As String = PageCom.GetNewCheckId()
+        Dim cd As String = Me.tbxCd.Text
+        Dim no As String = Me.tbxNo.Text
+        Dim jxs_name As String = ViewState("jxs_name")
+        Dim pre_ck_id As String = Me.hid_ck_id.Value
+        If cd = "" OrElse no = "" Then Exit Sub
+
+        Dim msg As String = BC.CreateNewChkAutoOK(cd, no, ck_id, CLoginInfo.user_cd, CLoginInfo.department_cd, CLoginInfo.line_cd, "")
+
+        If msg <> "" Then
+            PageCom.ShowMsg3(Me.Page, msg)
+        Else
+            PageCom.ShowMsg3(Me.Page, "自动OK设定了")
+            InitMs()
+            'CLoginInfo.cd = cd
+            'CLoginInfo.no = no
+            'CLoginInfo.ck_id = ck_id
+            'CLoginInfo.jxs_name = ViewState("jxs_name")
+            'CLoginInfo.TpNo = tbxTpNo.Text
+            'Session("CLoginInfo") = CLoginInfo
+            'Server.Transfer("t_check_ms.aspx")
+        End If
     End Sub
 End Class

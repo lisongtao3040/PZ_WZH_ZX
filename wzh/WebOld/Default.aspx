@@ -33,6 +33,9 @@
                     <input id="Reset1" type="reset" value="重置" class="login-btn" />
                     <asp:Button ID="btnLogin" runat="server" Text="登录" CssClass="login-btn login-submit" OnClientClick="return CheckLoginInput();" />
                 </div>
+                <div>
+                    <br />
+                </div>
             </div>
         </div>
     </form>

@@ -30,7 +30,7 @@ Partial Class t_FullTrayList
         If cd = "" OrElse no = "" Then Exit Sub
 
         Dim ck_id As String = PageCom.GetNewCheckId()
-        Dim msg As String = BC.CreateNewChk(cd, no, ck_id, CLoginInfo.user_cd, CLoginInfo.department_cd, CLoginInfo.line_cd, "")
+        Dim msg As String = BC.CreateNewChkAutoOK(cd, no, ck_id, CLoginInfo.user_cd, CLoginInfo.department_cd, CLoginInfo.line_cd, "")
 
         If msg <> "" Then
 

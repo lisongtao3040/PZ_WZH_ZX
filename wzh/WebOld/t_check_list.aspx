@@ -43,28 +43,20 @@
         <article>
             <div class="top_button_panel">
                 <asp:TextBox ID="tbxTpNo" CssClass="tp_barcode" runat="server" placeholder="托盘CD" Text="" Font-Size="40px" ForeColor="blue" Width="180px" Height="40px"></asp:TextBox>
-                <asp:Button ID="btnTpChkList" runat="server" Text="托盘检查一览" Width="210px" />
+                <asp:Button ID="btnTpChkList" runat="server" Text="托盘" Width="80px" />
                 <input type="button" id="btnClearTp" value="清空" />
-                 <asp:Button ID="btnLst" runat="server" Text="新一览" Width="210px" />
-                <div style="float: right">
-                     <input type="button" id="btnScsj" value="生产实际" />
-                    <input type="button" id="btnBuliang" value="不良一览" />
-                </div>
+                <asp:Button ID="btnLst" runat="server" Text="新一览" Width="110px" />
+
+                <input type="button" id="btnScsj" value="实际" />
+                <input type="button" id="btnBuliang" value="不良" />
+                                <asp:Button ID="btnAutoOK" runat="server" Text="自OK" Width="85" />
+
             </div>
 
             <div class="top_button_panel">
-
-                <%-- CHADDLWKKABTAXX 9006160969 --%>
-                <%-- CHFDEDMAAAAXXJX 9006331505 --%>
-                <%--CHADDLW3A1BTAXX 9006160965--%>
                 <asp:TextBox ID="tbxCd" runat="server" placeholder="商品CD" Text="" Width="300" Font-Size="26px" AutoCompleteType="Disabled"></asp:TextBox>
-
-
                 <asp:TextBox ID="tbxNo" runat="server" placeholder="作番" Text="" Width="160" Font-Size="26px" AutoCompleteType="Disabled"></asp:TextBox>
-                <%--              
-<input runat ="server"  type="tel"  id="tbxCd" placeholder="商品CD" Text="CHFDEDMAAAAXXJX" Width="300" Font-Size="26px" />
-<input runat ="server" type="tel" id="tbxNo"  placeholder="作番" Text="9006331505" Width="160" Font-Size="26px"  />
-                --%>
+
 
                 <asp:DropDownList ID="ddlHiinai" runat="server" Width="100px" Style="font-size: 26px;">
                 </asp:DropDownList>
@@ -72,18 +64,20 @@
                 <asp:Button ID="btnSel" runat="server" Text="检索" />
                 <asp:Button ID="btnBack" runat="server" Text="返回" />
                 <hr />
+
                 <asp:Button ID="btnNewChk" runat="server" Text="新规" Width="100" />
                 <asp:Button ID="btnSetDefault" runat="server" Text="默认" Width="100" />
-
                 <asp:Button ID="btnReChk" runat="server" Text="NG再检" Width="140" />
 
 
-                <%--                <asp:Button ID="btnContinue" runat="server" Text="继续检查"  Width="150"/>--%>
+
                 <asp:Button ID="btnInputByHand" runat="server" Text="手入力" Width="120" />
                 <asp:Button ID="btnClear" runat="server" Text="清除" Width="100" />
 
                 <asp:Button ID="btnNewChkNoPlan" runat="server" Text="无计划新规" Width="170" />
+
                 <asp:Label ID="lblGT" runat="server" Text=""></asp:Label>
+
             </div>
 
 

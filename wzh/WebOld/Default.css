@@ -1,30 +1,100 @@
 /* ===== Default.aspx 登录画面 ===== */
-html, body, form { height: 100%; margin: 0; }
-body { background: #eef0f3; color: #333; font-family: Meiryo, "Microsoft YaHei", Arial, sans-serif; }
+html, body, form {
+    height: 100%;
+    margin: 0;
+    font: 80%/1.65 Verdana,"Geneva CE",lucida,'Microsoft YaHei',sans-serif
+}
+
+body {
+    background: #eef0f3;
+    color: #333;
+}
 
 /* 整体居中 */
-.login-page { height: 100%; display: flex; align-items: center; justify-content: center; }
+.login-page {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
 /* 登录卡 */
-.login-card { width: 400px; background: #fff; border: 1px solid #cfd4da; }
+.login-card {
+    width: 400px;
+    background: #fff;
+    border: 1px solid #cfd4da;
+}
 
-.login-title { margin: 0; padding: 10px 20px; font-size: 16px; letter-spacing: 2px;
-               background: #095074; color: #fff; }
+.login-title {
+    margin: 0;
+    padding: 10px 20px;
+    font-size: 26px;
+    letter-spacing: 2px;
+    background: #095074;
+    color: #fff;
+}
 
 /* 输入区 */
-.login-body { padding: 16px 20px 0 20px; }
-.login-body label { display: block; margin: 12px 0 5px 0; font-size: 13px; color: #555; }
-.login-body input { width: 100%; height: 36px; padding: 0 8px; font-size: 15px;
-                    border: 1px solid #b6bdc6; border-radius: 2px;
-                    box-sizing: border-box; outline: none; font-family: inherit; }
-.login-body input:focus { border-color: #095074; }
+.login-body {
+    padding: 16px 20px 0 20px;
+}
+
+    .login-body label {
+        display: block;
+        margin: 12px 0 5px 0;
+        font-size: 23px;
+        color: #555;
+    }
+
+    .login-body input {
+        width: 100%;
+        height: 36px;
+        padding: 0 8px;
+        font-size: 25px;
+        border: 1px solid #b6bdc6;
+        border-radius: 2px;
+        box-sizing: border-box;
+        outline: none;
+        font-family: inherit;
+    }
+
+        .login-body input:focus {
+            border-color: #095074;
+        }
 
 /* 按钮行：两个按钮等大 */
-.login-actions { display: flex; padding: 20px; }
-.login-actions input { flex: 1; height: 36px; padding: 0; font-size: 15px; font-weight: bold;
-                       box-sizing: border-box;
-                       border: 1px solid #b6bdc6; border-radius: 2px;
-                       background: #f4f5f7; color: #333; cursor: pointer; font-family: inherit; }
-.login-actions input + input { margin-left: 12px; }
-.login-actions .login-submit { background: #095074; border-color: #095074; color: #fff; }
-.login-actions input:hover { background: #0d6e9c; border-color: #0d6e9c; color: #fff; }
+.login-actions {
+    display: flex;
+    padding: 20px;
+}
+
+    .login-actions input {
+        flex: 1;
+        height: 36px;
+        padding: 0;
+        font-size: 25px;
+        font-weight: bold;
+        box-sizing: border-box;
+        border: 1px solid #b6bdc6;
+        border-radius: 2px;
+        background: #f4f5f7;
+        color: #333;
+        cursor: pointer;
+        font-family: inherit;
+    }
+
+        .login-actions input + input {
+            margin-left: 12px;
+        }
+
+    .login-actions .login-submit {
+        background: #095074;
+        border-color: #095074;
+        color: #fff;
+    }
+
+    .login-actions input:hover {
+        background: #0d6e9c;
+        border-color: #0d6e9c;
+        color: #fff;
+    }

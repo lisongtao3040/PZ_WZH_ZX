@@ -1815,7 +1815,7 @@ Public Class t_checkDA
         sb.AppendLine("      ,yotei_chk_date AS yotei_chk_date")          '	yotei_chk_date
         sb.AppendLine("      ,getdate() as  chk_start_date")          '	chk_start_date
         sb.AppendLine("      ,NULL as chk_end_date")            '	chk_end_date
-        sb.AppendLine("      ,'4' AS status")          '	status   '  "0":检查中，  1:完了  2：默认结果完了    4:自动OK
+        sb.AppendLine("      ,'5' AS status")          '	status   '  "0":检查中，  1:完了  2：默认结果完了 4：手入力   5:自动OK
         sb.AppendLine("      ,'OK' AS result")
 
         sb.AppendLine("      ,1 AS chk_times")           '	chk_times

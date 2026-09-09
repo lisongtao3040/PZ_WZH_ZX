@@ -1,8 +1,8 @@
 ﻿@font-face {
     /*font-family: JetBrainsMono-Regular;
     src: url('./Font/JetBrainsMono-Regular.ttf') format('embedded-opentype'), url('./Font/JetBrainsMono-Regular.ttf') format('woff'), url(./Font/JetBrainsMono-Regular.woff2);*/
-    font-family: JetBrainsMono-ExtraBold;
-    src: url(./Font/JetBrainsMono-ExtraBold.woff2);
+/*    font-family: JetBrainsMono-ExtraBold;
+    src: url(./Font/JetBrainsMono-ExtraBold.woff2);*/
 }
 
 * {
@@ -16,7 +16,7 @@ html {
 
 body {
     height: 100%;
-    font-family: JetBrainsMono-ExtraBold,Meiryo, sans-serif;
+    font-family:Meiryo, sans-serif;
     background-color: #efefef;
     /* font-family: JetBrainsMono-ExtraBold;*/
 }
@@ -110,6 +110,7 @@ input[type="submit"], input[type="button"], input[type="reset"] {
 
 
     .gv td{
+        font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         text-align:center;
         font-weight:bold;
         word-break:break-all;
