@@ -39,6 +39,13 @@
             <asp:Button ID="btnBack" runat="server" Text="返回" CssClass="ftl-btn" />
             <input type="button" id="btnSearch" value="检索" class="ftl-btn" />
             <input type="button" id="btnToggleView" value="切换" class="ftl-btn ftl-btn-toggle" />
+
+            <%-- CD 筛选：点击输入框弹出虚拟键盘 --%>
+            <span class="ftl-filter-bar">
+                <input type="text" id="txtCdFilter" class="ftl-cd-input" readonly placeholder="CD筛选" title="点击弹出键盘输入CD" maxlength="30" />
+                <input type="button" id="btnCdClear" value="清空" class="ftl-btn" />
+            </span>
+
     <asp:Label ID="lblUserCd" runat="server" Text="Label"></asp:Label>
                 <asp:Label ID="lblUserName" runat="server" Text="Label"></asp:Label>
             <span id="lblStatus" class="ftl-status"></span>

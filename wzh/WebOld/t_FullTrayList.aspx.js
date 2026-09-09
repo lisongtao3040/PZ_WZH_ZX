@@ -11,10 +11,94 @@ $(function () {
     $('#btnToggleView').click(function () {
         toggleView();
     });
+
+    // CD 筛选：虚拟键盘
+    buildCdKeypad();
+    $('#txtCdFilter').focus(function () {
+        $('#cdKeypad').show();
+    });
+    $('#txtCdFilter').click(function () {
+        $('#cdKeypad').show();
+    });
+    $('#txtCdFilter').blur(function () {
+        $('#cdKeypad').hide();
+    });
+    // 键盘按钮点击不抢焦点（保持输入框 focus，键盘不消失）
+    $('#cdKeypad').mousedown(function (e) {
+        e.preventDefault();
+    });
+    $('#cdKeypad').on('click', '.ftl-key', function () {
+        var ch = $(this).data('ch');
+        if (ch === 'done') {
+            $('#cdKeypad').hide();
+        } else if (ch === 'back') {
+            delCdChar();
+        } else {
+            addCdChar(ch);
+        }
+    });
+    $('#btnCdClear').click(function () {
+        $('#txtCdFilter').val('');
+        doCdFilter();
+        $('#txtCdFilter').focus();
+    });
 });
 
 // 当前视图模式: 'row' | 'panel'
 var ftlViewMode = 'row';
+var ftlData = [];      // 最近取得的数据
+var ftlCdDir = 0;      // CD排序: 0不排序 / 1升序 / -1降序
+var ftlCdFilter = '';  // CD筛选关键字
+
+// 虚拟键盘：仅大写英文与数字
+var CD_KEYS = [
+    ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+    ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
+    ['Z', 'X', 'C', 'V', 'B', 'N', 'M'],
+    ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
+];
+
+// 构建虚拟键盘 DOM（只构建一次）
+function buildCdKeypad() {
+    if ($('#cdKeypad').length > 0) return;
+    var html = '<div id="cdKeypad" class="ftl-keypad" style="display:none;">';
+    $.each(CD_KEYS, function (r, row) {
+        html += '<div class="ftl-keypad-row">';
+        $.each(row, function (c, ch) {
+            html += '<button type="button" class="ftl-key" data-ch="' + ch + '">' + ch + '</button>';
+        });
+        html += '</div>';
+    });
+    html += '<div class="ftl-keypad-row">' +
+        '<button type="button" class="ftl-key ftl-key-wide" data-ch="back">退格</button>' +
+        '<button type="button" class="ftl-key ftl-key-wide ftl-key-done" data-ch="done">完成</button>' +
+        '</div>';
+    html += '</div>';
+    $('body').append(html);
+}
+
+// 应用 CD 筛选并刷新视图
+function doCdFilter() {
+    ftlCdFilter = $('#txtCdFilter').val().toUpperCase();
+    $('#txtCdFilter').val(ftlCdFilter);
+    applyView();
+}
+
+// 虚拟键盘输入一个字符
+function addCdChar(ch) {
+    var el = $('#txtCdFilter');
+    if (el.val().length < 30) {
+        el.val(el.val() + ch);
+    }
+    doCdFilter();
+}
+
+// 虚拟键盘退格
+function delCdChar() {
+    var el = $('#txtCdFilter');
+    el.val(el.val().slice(0, -1));
+    doCdFilter();
+}
 
 // 从 ASMX 取得数据并渲染
 function loadData() {
@@ -29,8 +113,8 @@ function loadData() {
             var res = JSON.parse(response.d);
             if (res.success) {
                 $('#lblStatus').text('共 ' + res.data.length + ' 条');
-                renderRowView(res.data);
-                renderPanelView(res.data);
+                ftlData = res.data;
+                applyView();
             } else {
                 $('#lblStatus').text('加载失败：' + res.message);
             }
@@ -56,66 +140,97 @@ function groupByTray(data) {
     return { groups: groups, order: order };
 }
 
+// 按 CD 排序（台车分组整体移动，不拆散台车号 group；组内也按 CD 排）
+function sortByCd(data, dir) {
+    var g = groupByTray(data);
+    var trays = [];
+    $.each(g.order, function (i, key) {
+        var items = g.groups[key].slice().sort(function (a, b) {
+            return a.sapCode > b.sapCode ? 1 : (a.sapCode < b.sapCode ? -1 : 0);
+        });
+        trays.push({ key: key, items: items });
+    });
+    // 以每组最小 CD 决定台车顺序
+    trays.sort(function (a, b) {
+        var ka = a.items[0].sapCode;
+        var kb = b.items[0].sapCode;
+        var r = ka > kb ? 1 : (ka < kb ? -1 : 0);
+        return dir * r;
+    });
+    var out = [];
+    $.each(trays, function (i, t) {
+        $.each(t.items, function (j, it) { out.push(it); });
+    });
+    return out;
+}
+
+// 用当前 CD 筛选 + CD 排序 刷新行/面板两个视图
+function applyView() {
+    var data = ftlData;
+
+    // CD 筛选（部分匹配；每行仍按台车分组渲染，不拆散 group）
+    if (ftlCdFilter !== '') {
+        var f = ftlCdFilter.toUpperCase();
+        data = $.grep(ftlData, function (it) {
+            return it.sapCode && it.sapCode.toUpperCase().indexOf(f) >= 0;
+        });
+    }
+    if (ftlCdDir !== 0) {
+        data = sortByCd(data, ftlCdDir);
+    }
+
+    $('#lblStatus').text('共 ' + data.length + ' 条');
+    renderRowView(data);
+    renderPanelView(data);
+}
+
+// 点击“CD”表头：升序 → 降序 → 还原
+function toggleCdSort() {
+    ftlCdDir = (ftlCdDir === 0) ? 1 : (ftlCdDir === 1 ? -1 : 0);
+    applyView();
+}
+
 // HTML 转义，防止XSS
 function esc(str) {
     return $('<div>').text(str).html();
 }
 
-// ===== 行视图渲染（每条数据显示2行）=====
+// ===== 行视图渲染（单行表：台车号/生产线/订单号/CD/储备计划/初检/三方/操作）=====
 function renderRowView(data) {
     var g = groupByTray(data);
-    var colCnt = 6;
     var html = '<table class="ftl-row-table"><colgroup>' +
         '<col class="col-tray-id"/>' +
-        '<col class="col-id"/><col class="col-status"/>' +
-        '<col class="col-tray-status"/><col class="col-line"/><col class="col-jizhong"/><col class="col-action-m"/>' +
+        '<col class="col-line"/><col class="col-order"/>' +
+        '<col class="col-cd"/><col class="col-bian"/>' +
+        '<col class="col-first"/><col class="col-third"/>' +
+        '<col class="col-action"/>' +
         '</colgroup>' +
-        '<thead>' +
-        '<tr>' +
-        '<th rowspan="2">台车号</th>' +
-        '<th>编号(托盘)</th><th>状态</th><th>托盘状态编号</th><th>生产线</th><th>机种 / 结果</th><th>数量</th>' +
-        '</tr>' +
-        '<tr>' +
-        '<th colspan="2">明细书</th><th>订单号</th><th>CD</th><th>向先</th><th>操作</th>' +
-        '</tr>' +
-        '</thead>' +
+        '<thead><tr>' +
+        '<th>台车号</th><th>生产线</th><th>订单号</th>' +
+        '<th class="ftl-sort-cd" onclick="toggleCdSort()" title="点击按CD排序">CD <span class="ftl-sort-arrow">' + (ftlCdDir === 1 ? '▲' : (ftlCdDir === -1 ? '▼' : '⇅')) + '</span></th><th>储备计划</th><th>初检</th><th>三方</th><th>操作</th>' +
+        '</tr></thead>' +
         '<tbody>';
 
     $.each(g.order, function (i, groupKey) {
         var items = g.groups[groupKey];
-
-        var rowspan = items.length * 2;
+        var rowspan = items.length;
 
         $.each(items, function (j, item) {
             var isOK = (item.result && item.result.trim() === 'OK');
-            var hasResult = (item.result && item.result.trim() !== '');
-            var isLast = (j === items.length - 1);
 
-            // 第1行：编号 / 状态 / 托盘状态编号 / 生产线 / 机种+结果 / 数量
-            html += '<tr class="ftl-data-row ftl-row-top">';
+            html += '<tr class="ftl-data-row">';
             if (j === 0) {
                 html += '<td rowspan="' + rowspan + '" class="ftl-group-cell">' + esc(groupKey) + '<br/>';
                 html += '<button type="button" class="ftl-btn-call" onclick="callAgv(\'' + esc(groupKey) + '\',\'' + esc(item.stationNo) + '\',this)">呼叫</button>';
                 html += '</td>';
             }
-            html += '<td>' + esc(item.stationNo) + '</td>';
-            html += '<td>' + esc(item.innerCodeDes) + '</td>';
-            html += '<td>' + esc(item.stationUse) + '</td>';
             html += '<td>' + esc(item.lineCodeShort) + (item.line_name ? '(' + esc(item.line_name) + ')' : '') + '</td>';
-            html += '<td>' + esc(item.jizhong);
-            if (hasResult) {
-                html += '&nbsp;<span class="ftl-result-badge ftl-result-' + esc(item.result) + '">' + esc(item.result) + '</span>';
-            }
-            html += '</td>';
-            html += '<td style="text-align:right;">' + esc(item.packageAmount) + '</td>';
-            html += '</tr>';
-
-            // 第2行：明细书(colspan=2) / 订单号 / CD / 向先 / 操作
-            html += '<tr class="ftl-data-row ftl-row-bot' + (isLast ? ' ftl-row-last' : '') + '">';
-            html += '<td colspan="2" class="ftl-cell-truncate" title="' + esc(item.Ttxt) + '">' + esc(item.Ttxt) + '</td>';
+            var isBianBichu = (item.bianCode && item.bianCode.indexOf('備蓄') >= 0);
             html += '<td>' + esc(item.OrderNo) + '</td>';
             html += '<td>' + esc(item.sapCode) + '</td>';
-            html += '<td>' + esc(item.destination) + '</td>';
+            html += '<td' + (isBianBichu ? ' class="ftl-bian-bichu"' : '') + '>' + esc(item.bianCode) + '</td>';
+            html += '<td>' + esc(item.firstCheck) + '</td>';
+            html += '<td>' + esc(item.thirdParty) + '</td>';
             html += '<td>';
             if (!isOK) {
                 html += '<button type="button" class="ftl-btn-check" onclick="onCheckClick(\'' + esc(item.stationNo) + '\',\'' + esc(item.sapCode) + '\',\'' + esc(item.OrderNo) + '\')">检查</button>';
@@ -130,7 +245,7 @@ function renderRowView(data) {
     $('#rowViewBody').html(html);
 }
 
-// ===== 面板视图渲染 =====
+// ===== 面板视图渲染（台车号/生产线/订单号/CD/储备计划/初检/三方 + 操作）=====
 function renderPanelView(data) {
     var g = groupByTray(data);
     var html = '';
@@ -146,26 +261,18 @@ function renderPanelView(data) {
 
         $.each(items, function (j, item) {
             var isOK = (item.result && item.result.trim() === 'OK');
-            var hasResult = (item.result && item.result.trim() !== '');
+            var isBianBichu = (item.bianCode && item.bianCode.indexOf('備蓄') >= 0);
             html += '<div class="ftl-panel-item">';
-            html += panelRow('台车号', item.trayNo);
-            html += panelRow('状态', item.innerCodeDes);
-            html += panelRow('托盘状态编号', item.stationUse);
             html += panelRow('生产线', item.lineCodeShort);
-            html += panelRow('明细书', item.Ttxt);
             html += panelRow('订单号', item.OrderNo);
             html += panelRow('CD', item.sapCode);
-            html += panelRow('数量', item.packageAmount);
-            html += panelRow('向先', item.destination);
-            html += panelRow('机种', item.jizhong);
-            if (hasResult) {
-                html += panelRow('检查结果', item.result,
-                    item.result === 'OK' ? 'color:#006600;font-weight:bold;' :
-                    item.result === 'NG' ? 'color:#cc0000;font-weight:bold;' : '');
-            }
+            html += '<div class="ftl-panel-row"><span class="ftl-panel-label">储备计划:</span><span class="ftl-panel-val' + (isBianBichu ? ' ftl-bian-bichu' : '') + '">' + esc(item.bianCode) + '</span></div>';
+            html += panelRow('初检', item.firstCheck);
+            html += panelRow('三方', item.thirdParty);
             if (!isOK) {
                 html += '<div class="ftl-panel-actions">';
                 html += '<button type="button" class="ftl-btn-check" onclick="onCheckClick(\'' + esc(item.stationNo) + '\',\'' + esc(item.sapCode) + '\',\'' + esc(item.OrderNo) + '\')">检查</button>';
+                html += '<button type="button" class="ftl-btn-autook" onclick="onAutoOkClick(\'' + esc(item.stationNo) + '\',\'' + esc(item.sapCode) + '\',\'' + esc(item.OrderNo) + '\')">自动OK</button>';
                 html += '</div>';
             }
             html += '</div>'; // ftl-panel-item

@@ -49,7 +49,7 @@
 
                 <input type="button" id="btnScsj" value="实际" />
                 <input type="button" id="btnBuliang" value="不良" />
-                                <asp:Button ID="btnAutoOK" runat="server" Text="自OK" Width="85" />
+                                <asp:Button ID="btnAutoOK" runat="server" Text="免检" Width="80" />
 
             </div>
 

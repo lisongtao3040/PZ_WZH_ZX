@@ -742,7 +742,7 @@ Partial Class t_check_list
         ElseIf status = "4" Then
             sb.Append("手入力")
         ElseIf status = "5" Then
-            sb.Append("自动OK")
+            sb.Append("免检")
         End If
 
 

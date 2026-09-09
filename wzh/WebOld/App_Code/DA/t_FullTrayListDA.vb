@@ -18,6 +18,8 @@ Public Class t_FullTrayListDA
         sb.AppendLine("    ,[destination]")
         sb.AppendLine("    ,[jizhong]")
         sb.AppendLine("    ,[lineCodeShort]")
+        sb.AppendLine("    ,[BianCode]")
+
         'sb.AppendLine("FROM [10.160.192.127].[scgl_PeiSong].[dbo].[v_TwoMetresFullTrayDetail]")
         sb.AppendLine("FROM [v_TwoMetresFullTrayDetail]")
         sb.AppendLine("ORDER BY [trayNo]")

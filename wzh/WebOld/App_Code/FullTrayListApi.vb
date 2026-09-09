@@ -30,6 +30,8 @@ Public Class FullTrayListApi
             Dim BC As New t_FullTrayListBC()
             Dim dt As DataTable = BC.GetFullTrayListWithResult()
 
+            Dim DA As New t_checkDA
+
             Dim list As New List(Of Dictionary(Of String, Object))
             For Each row As DataRow In dt.Rows
                 Dim item As New Dictionary(Of String, Object)
@@ -43,9 +45,30 @@ Public Class FullTrayListApi
                 item("packageAmount") = row("packageAmount").ToString()
                 item("destination") = row("destination").ToString()
                 item("jizhong") = row("jizhong").ToString()
+                item("bianCode") = If(dt.Columns.Contains("BianCode"), row("BianCode").ToString(), "")
+                '【初检/三方】 暂时绑定空，业务逻辑待实现
+                item("firstCheck") = ""
+                item("thirdParty") = ""
                 item("lineCodeShort") = row("lineCodeShort").ToString()
                 item("line_name") = row("line_name").ToString()
                 item("result") = row("result").ToString()
+
+                Dim goods_cd As String = row("sapCode").ToString()
+                Dim line_cd As String = row("lineCodeShort").ToString()
+
+                If DA.Gettongyong_cd_step2(goods_cd) <> "" Then
+                    '初检商品CD判断
+                    If DA.GetFirstCheck_step2(goods_cd, line_cd) = "" Then
+                        item("firstCheck") = "YES"
+                    End If
+                End If
+
+                If DA.Gettongyong_cd(goods_cd) <> "" Then
+                    '初检商品CD判断
+                    If DA.GetFirstCheck(goods_cd) = "" Then
+                        item("thirdParty") = "YES"
+                    End If
+                End If
                 list.Add(item)
             Next
 
