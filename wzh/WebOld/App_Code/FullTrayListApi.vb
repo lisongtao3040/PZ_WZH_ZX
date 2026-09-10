@@ -32,6 +32,68 @@ Public Class FullTrayListApi
 
             Dim DA As New t_checkDA
 
+            Dim cdsSet As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase)
+            For Each row As DataRow In dt.Rows
+                Dim sapCode As String = row("sapCode").ToString().Trim()
+                If sapCode <> "" Then cdsSet.Add(sapCode)
+            Next
+            Dim cds As String = String.Join(",",
+            cdsSet.Select(Function(n) "'" & n.Replace("'", "''") & "'").ToArray())
+
+
+            Dim dic_cd_tongyong As New Dictionary(Of String, String)
+            Dim dic_f As New Dictionary(Of String, String)
+            Dim dtMerged As DataTable = DA.Gettongyong_cd_Merged_CDS_Large(cds)
+            For Each row As DataRow In dtMerged.Rows
+                'CD没有 -
+                Dim cd As String = row("cd").ToString().Trim()
+                Dim tongyong_cd As String = row("tongyong_cd").ToString().Trim()
+                Dim source_type As String = row("source_type").ToString().Trim()
+
+                If source_type = "STEP2" Then
+                    '三方
+                    If Not dic_cd_tongyong.ContainsKey(cd) Then
+                        dic_cd_tongyong.Add(cd, tongyong_cd)
+                    End If
+                Else
+                    '初检
+                    If Not dic_f.ContainsKey(cd) Then
+                        dic_f.Add(cd, tongyong_cd)
+                    End If
+                End If
+
+            Next
+
+
+
+
+
+
+            'Dim dt2 As DataTable = DA.Gettongyong_cd_step2_CDS(cds)
+            'For Each row As DataRow In dt2.Rows
+            '    'CD没有 -
+            '    Dim cd As String = row("cd").ToString().Trim()
+            '    Dim tongyong_cd As String = row("tongyong_cd").ToString().Trim()
+            '    If Not dic_cd_tongyong.ContainsKey(cd) Then
+            '        dic_cd_tongyong.Add(cd, tongyong_cd)
+            '    End If
+            'Next
+
+
+
+
+            'Dim dt3 As DataTable = DA.Gettongyong_cd_CDS(cds)
+            'For Each row As DataRow In dt3.Rows
+            '    'CD没有 -
+            '    Dim cd As String = row("cd").ToString().Trim()
+            '    Dim tongyong_cd As String = row("tongyong_cd").ToString().Trim()
+            '    If Not dic_f.ContainsKey(cd) Then
+            '        dic_f.Add(cd, tongyong_cd)
+            '    End If
+            'Next
+
+
+
             Dim list As New List(Of Dictionary(Of String, Object))
             For Each row As DataRow In dt.Rows
                 Dim item As New Dictionary(Of String, Object)
@@ -56,20 +118,38 @@ Public Class FullTrayListApi
                 Dim goods_cd As String = row("sapCode").ToString()
                 Dim line_cd As String = row("lineCodeShort").ToString()
 
-                If DA.Gettongyong_cd_step2(goods_cd) <> "" Then
+                ''是否有通用CD判断
+                'If DA.Gettongyong_cd_step2(goods_cd) <> "" Then
+                '    '初检商品CD判断
+                '    If DA.GetFirstCheck_step2(goods_cd, line_cd) = "" Then
+                '        item("firstCheck") = "YES"
+                '    End If
+                'End If
+
+                '是否有通用CD判断
+                If dic_cd_tongyong.ContainsKey(goods_cd.Replace("-", "")) Then
                     '初检商品CD判断
                     If DA.GetFirstCheck_step2(goods_cd, line_cd) = "" Then
                         item("firstCheck") = "YES"
                     End If
                 End If
 
-                If DA.Gettongyong_cd(goods_cd) <> "" Then
+
+
+                'If DA.Gettongyong_cd(goods_cd) <> "" Then
+                '    '初检商品CD判断
+                '    If DA.GetFirstCheck(goods_cd) = "" Then
+                '        item("thirdParty") = "YES"
+                '    End If
+                'End If
+                If dic_f.ContainsKey(goods_cd.Replace("-", "")) Then
                     '初检商品CD判断
                     If DA.GetFirstCheck(goods_cd) = "" Then
                         item("thirdParty") = "YES"
                     End If
                 End If
                 list.Add(item)
+
             Next
 
             Return jss.Serialize(New With {.success = True, .data = list})

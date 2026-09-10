@@ -1,7 +1,6 @@
 ﻿<%@ Page Language="VB" AutoEventWireup="false" CodeFile="t_check_list.aspx.vb" Inherits="t_check_list" %>
-
 <%@ Register Src="~/UserControls/Header.ascx" TagPrefix="uc1" TagName="Header" %>
-<%@ Register Src="~/UserControls/Footer.ascx" TagPrefix="uc2" TagName="Footer" %>
+
 <!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -49,7 +48,7 @@
 
                 <input type="button" id="btnScsj" value="实际" />
                 <input type="button" id="btnBuliang" value="不良" />
-                                <asp:Button ID="btnAutoOK" runat="server" Text="免检" Width="80" />
+                <asp:Button ID="btnAutoOK" runat="server" Text="免检" Width="80" OnClientClick="if(confirm('真的要免检么？')){return true}else{return false}" />
 
             </div>
 

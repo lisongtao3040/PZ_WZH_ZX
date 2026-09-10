@@ -5,6 +5,9 @@ Imports SqlHelper
 Imports System.CodeDom.Compiler
 Imports MSScriptControl
 
+Imports System.Data.SqlClient
+Imports System.Text
+
 
 Public Class t_checkDA
 
@@ -1673,25 +1676,12 @@ Public Class t_checkDA
     Public Function GetFirstCheck_step2(ByVal cd As String, ByVal line_cd As String) As String
 
         Dim sb As New StringBuilder
-        'sb.AppendLine("SELECT tongyong_cd FROM m_first_chk_cds where tongyong_cd in (")
-        ''sb.AppendLine("SELECT tongyong_cd FROM m_first_chk_cds where replace(cd,'-','') = '" & cd.Replace("-", "") & "' and line_cd='" & line_cd & "')")
-        'sb.AppendLine("SELECT tongyong_cd FROM m_first_chk_cds where replace(cd,'-','') = '" & cd.Replace("-", "") & "')")
-        'sb.AppendLine("and checked_flg='1'")
-
-        'sb.AppendLine("SELECT 1 FROM m_first_chk_step2 where replace(CD,'-','') = '" & cd.Replace("-", "") & "'  and line_cd='" & line_cd & "'")
-
-
-
         sb.AppendLine("SELECT 1 FROM m_first_chk_step2 where replace(CD,'-','') in (")
         sb.AppendLine("    SELECT replace(CD,'-','') FROM m_first_chk_cds WHERE tongyong_cd in(")
         sb.AppendLine("        SELECT tongyong_cd FROM m_first_chk_cds where replace(cd,'-','') = '" & cd.Replace("-", "") & "'")
         sb.AppendLine("    )")
         sb.AppendLine(")")
         sb.AppendLine("and line_cd='" & line_cd & "'")
-
-        'Dim ds As New DataSet
-        '検索の実行
-        'FillDataset(DataAccessManager.Connection, CommandType.Text, sb.ToString(), ds, "GetFirstCheck", paramList.ToArray)
 
         Dim dt As DataTable = FillData(DataAccessManager.ConnStr, CommandType.Text, sb.ToString(), "GetFirstCheck_step2")
 
@@ -1719,6 +1709,18 @@ Public Class t_checkDA
 
     End Function
 
+    Public Function Gettongyong_cd_step2_CDS(ByVal cds As String) As DataTable
+
+        Dim sb As New StringBuilder
+        sb.AppendLine(" SELECT replace(cd,'-','') cd,tongyong_cd FROM m_first_chk_cds where replace(cd,'-','') in(" & cds.Replace("-", "") & ")")
+
+        '検索の実行
+        Dim dt As DataTable = FillData(DataAccessManager.ConnStr, CommandType.Text, sb.ToString(), "Gettongyong_cd")
+
+        Return dt
+
+    End Function
+
     Public Function Gettongyong_cd(ByVal cd As String) As String
 
         Dim sb As New StringBuilder
@@ -1732,6 +1734,18 @@ Public Class t_checkDA
         Else
             Return ""
         End If
+
+    End Function
+
+
+    Public Function Gettongyong_cd_CDS(ByVal cds As String) As DataTable
+
+        Dim sb As New StringBuilder
+        sb.AppendLine(" SELECT replace(good_cd,'-','') cd,tongyong_cd FROM t_first_check where replace(good_cd,'-','') in(" & cds.Replace("-", "") & ")")
+        '検索の実行
+        Dim dt As DataTable = FillData(DataAccessManager.ConnStr, CommandType.Text, sb.ToString(), "Gettongyong_cd")
+
+        Return dt
 
     End Function
 
@@ -1955,6 +1969,95 @@ Public Class t_checkDA
 
     End Function
 
+
+    Public Function Gettongyong_cd_Merged_CDS(ByVal cds As String) As DataTable
+
+        ' 预处理输入的 cds 参数
+        Dim formattedCds As String = cds.Replace("-", "")
+
+        Dim sb As New StringBuilder
+        ' 追加 source_type 列标识数据来源：'STEP2' 表示来自 m_first_chk_cds
+        sb.AppendLine(" SELECT 'STEP2' AS source_type, REPLACE(cd, '-', '') AS cd, tongyong_cd FROM m_first_chk_cds ")
+        sb.AppendLine(" WHERE REPLACE(cd, '-', '') IN (" & formattedCds & ") ")
+        sb.AppendLine(" UNION ALL ")
+        ' 追加 source_type 列标识数据来源：'FIRST' 表示来自 t_first_check
+        sb.AppendLine(" SELECT 'FIRST' AS source_type, REPLACE(good_cd, '-', '') AS cd, tongyong_cd FROM t_first_check ")
+        sb.AppendLine(" WHERE REPLACE(good_cd, '-', '') IN (" & formattedCds & ") ")
+
+        ' 执行查询
+        Dim dt As DataTable = FillData(DataAccessManager.ConnStr, CommandType.Text, sb.ToString(), "Gettongyong_cd")
+
+        Return dt
+
+    End Function
+
+    Public Function Gettongyong_cd_Merged_CDS_Large(ByVal cds As String) As DataTable
+
+        ' 1. 清理输入并转为纯 CD 数组
+        Dim cdArray As String() = cds.Replace("-", "").Split(New Char() {","c, " "c, vbCr, vbLf}, StringSplitOptions.RemoveEmptyEntries)
+
+        ' 如果没有传入任何 CD，直接返回空表
+        If cdArray.Length = 0 Then
+            Return New DataTable()
+        End If
+
+        ' 2. 在内存中构建要插入临时表的数据结构
+        Dim dtTmp As New DataTable()
+        dtTmp.Columns.Add("cd", GetType(String))
+
+        ' 使用 HashSet 去重，减少不必要的插入和查询压力
+        Dim uniqueCds As New HashSet(Of String)(cdArray, StringComparer.OrdinalIgnoreCase)
+        For Each cd As String In uniqueCds
+            dtTmp.Rows.Add(cd.Trim())
+        Next
+
+        Dim dtResult As New DataTable()
+
+        ' 3. 使用同一个 Connection 执行整个流程（临时表仅在当前 Connection 内有效）
+        Using conn As New SqlConnection(DataAccessManager.ConnStr)
+            conn.Open()
+
+            ' Step A: 创建带索引的临时表，提高后续 JOIN 性能
+            Dim createTmpSql As String = "CREATE TABLE #TmpCds (cd VARCHAR(50) PRIMARY KEY);"
+            Using cmdCreate As New SqlCommand(createTmpSql, conn)
+                cmdCreate.ExecuteNonQuery()
+            End Using
+
+            ' Step B: 使用 SqlBulkCopy 将数据高速写入临时表
+            Using bulkCopy As New SqlBulkCopy(conn)
+                bulkCopy.DestinationTableName = "#TmpCds"
+                bulkCopy.BatchSize = 5000 ' 每 5000 条为一个批次写入
+                bulkCopy.WriteToServer(dtTmp)
+            End Using
+
+            ' Step C: 编写 JOIN 关联查询 SQL
+            Dim sb As New StringBuilder()
+            ' 第一部分：从 m_first_chk_cds 关联查询
+            sb.AppendLine(" SELECT 'STEP2' AS source_type, REPLACE(m.cd, '-', '') AS cd, m.tongyong_cd ")
+            sb.AppendLine(" FROM m_first_chk_cds m WITH(NOLOCK) ")
+            sb.AppendLine(" INNER JOIN #TmpCds tmp ON REPLACE(m.cd, '-', '') = tmp.cd ")
+
+            sb.AppendLine(" UNION ALL ")
+
+            ' 第二部分：从 t_first_check 关联查询
+            sb.AppendLine(" SELECT 'FIRST' AS source_type, REPLACE(t.good_cd, '-', '') AS cd, t.tongyong_cd ")
+            sb.AppendLine(" FROM t_first_check t WITH(NOLOCK) ")
+            sb.AppendLine(" INNER JOIN #TmpCds tmp ON REPLACE(t.good_cd, '-', '') = tmp.cd ")
+
+            ' Step D: 执行查询并将结果填充到 DataTable
+            Using cmdQuery As New SqlCommand(sb.ToString(), conn)
+                ' 针对大批量的查询，建议把超时时间调大（如 120 秒）
+                cmdQuery.CommandTimeout = 120
+                Using adapter As New SqlDataAdapter(cmdQuery)
+                    adapter.Fill(dtResult)
+                End Using
+            End Using
+
+        End Using ' 此处 conn 关闭，临时表 #TmpCds 会被 SQL Server 自动 DROP 释放
+
+        Return dtResult
+
+    End Function
 
 
 End Class

@@ -228,7 +228,7 @@ function renderRowView(data) {
             var isBianBichu = (item.bianCode && item.bianCode.indexOf('備蓄') >= 0);
             html += '<td>' + esc(item.OrderNo) + '</td>';
             html += '<td>' + esc(item.sapCode) + '</td>';
-            html += '<td' + (isBianBichu ? ' class="ftl-bian-bichu"' : '') + '>' + esc(item.bianCode) + '</td>';
+            html += '<td' + (isBianBichu ? ' class="ftl-bian-bichu"' : '') + '>' + (isBianBichu ? '備蓄': '') + '</td>';
             html += '<td>' + esc(item.firstCheck) + '</td>';
             html += '<td>' + esc(item.thirdParty) + '</td>';
             html += '<td>';
@@ -266,7 +266,7 @@ function renderPanelView(data) {
             html += panelRow('生产线', item.lineCodeShort);
             html += panelRow('订单号', item.OrderNo);
             html += panelRow('CD', item.sapCode);
-            html += '<div class="ftl-panel-row"><span class="ftl-panel-label">储备计划:</span><span class="ftl-panel-val' + (isBianBichu ? ' ftl-bian-bichu' : '') + '">' + esc(item.bianCode) + '</span></div>';
+            html += '<div class="ftl-panel-row"><span class="ftl-panel-label">配送便别:</span><span class="ftl-panel-val' + (isBianBichu ? ' ftl-bian-bichu' : '') + '">' + (isBianBichu ? '備蓄': '') + '</span></div>';
             html += panelRow('初检', item.firstCheck);
             html += panelRow('三方', item.thirdParty);
             if (!isOK) {
