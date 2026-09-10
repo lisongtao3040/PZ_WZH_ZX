@@ -1,4 +1,5 @@
 ﻿<%@ Page Language="VB" AutoEventWireup="false" CodeFile="t_check_list.aspx.vb" Inherits="t_check_list" %>
+
 <%@ Register Src="~/UserControls/Header.ascx" TagPrefix="uc1" TagName="Header" %>
 
 <!DOCTYPE html>
@@ -25,15 +26,20 @@
     <script type="text/javascript" src="./t_check_list.aspx.js?randomId=<%=PageCom.GetYmdhmsf()%>"></script>
 </head>
 <body>
-    <%--cd	no CHADZDH1CABXXXX	9013568433--%>
     <form id="form1" runat="server">
 
-        <div style="position: absolute; z-index: 100000; top: 10px; left: 10px;">
-            <asp:LinkButton ID="lbSCX" runat="server">查看生产性</asp:LinkButton>
-            <asp:CheckBox ID="cb1" runat="server" Text="1部" Checked="true" />
-            <asp:CheckBox ID="cb2" runat="server" Text="2部" Checked="true" />
-            <asp:CheckBox ID="cb3" runat="server" Text="3部" Checked="true" />
-            <asp:CheckBox ID="cb4" runat="server" Text="4部" Checked="true" />
+        <div style="position: absolute; z-index: 100000; top: 5px; left: 10px;">
+            <div>
+                <asp:LinkButton ID="lbSCX" runat="server">查看生产性</asp:LinkButton>
+                <asp:CheckBox ID="cb1" runat="server" Text="1部" Checked="true" />
+                <asp:CheckBox ID="cb2" runat="server" Text="2部" Checked="true" />
+                <asp:CheckBox ID="cb3" runat="server" Text="3部" Checked="true" />
+                <asp:CheckBox ID="cb4" runat="server" Text="4部" Checked="true" />
+            </div>
+
+            <div style="background-color:aqua; width: 320px; height: 32px; vertical-align: middle;border-radius:4px;">
+                <a style="color: red; font-size: 22px">●</a>   [<asp:Label ID="lblGT" runat="server" Text="" Font-Size="20px" ForeColor="Red" Font-Bold="true"></asp:Label>]
+            </div>
 
         </div>
         <uc1:Header runat="server" ID="UserHeader" title="检查一览" />
@@ -75,7 +81,7 @@
 
                 <asp:Button ID="btnNewChkNoPlan" runat="server" Text="无计划新规" Width="170" />
 
-                <asp:Label ID="lblGT" runat="server" Text=""></asp:Label>
+
 
             </div>
 
