@@ -63,7 +63,7 @@ EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "WebOld", "..\WebOld\", "{F9ED7CDF-3CAC-5456-AC6D-6C743E21BBD3}"
 	ProjectSection(WebsiteProperties) = preProject
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5"
-		ProjectReferences = "{4f4f8de7-83ab-4a32-ae15-290568229f90}|CommonType.dll;{b52d0437-18cb-4b59-a135-485633fc2e20}|UserControls.dll;"
+		ProjectReferences = "{4f4f8de7-83ab-4a32-ae15-290568229f90}|CommonType.dll;{b52d0437-18cb-4b59-a135-485633fc2e20}|UserControls.dll;{94fbd012-6744-439b-a23a-890e09d7e4c7}|SqlHelper.dll;"
 		Debug.AspNetCompiler.VirtualPath = "/localhost_60055"
 		Debug.AspNetCompiler.PhysicalPath = "..\WebOld\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_60055\"

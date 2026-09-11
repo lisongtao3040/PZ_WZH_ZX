@@ -22,7 +22,7 @@ Public Class t_FullTrayListDA
 
         'sb.AppendLine("FROM [10.160.192.127].[scgl_PeiSong].[dbo].[v_TwoMetresFullTrayDetail]")
         sb.AppendLine("FROM [v_TwoMetresFullTrayDetail]")
-        sb.AppendLine("ORDER BY [trayNo]")
+        ' sb.AppendLine("ORDER BY [trayNo]")
 
         Return FillData(DataAccessManager.TCMConnStr, CommandType.Text, sb.ToString(), "GetFullTrayList")
     End Function
