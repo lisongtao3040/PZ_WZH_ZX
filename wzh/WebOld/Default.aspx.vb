@@ -40,9 +40,10 @@ Partial Class _Default
         End If
     End Sub
 
-
+    ''' <summary>
+    ''' 画面打开时，设置cookie为空
+    ''' </summary>
     Private Sub JsLoad()
-
         Dim sb As New StringBuilder
         sb.AppendLine("<script language='javascript'>")
         sb.AppendLine("$(document).ready(function () {")

@@ -23,12 +23,14 @@
 
                 <div class="login-body">
                     <label for="tbxUserCd">用户CD</label>
-                    <asp:TextBox ID="tbxUserCd" runat="server" MaxLength="20" title="用户CD（半角英数字）" Text=""></asp:TextBox>
+                    <asp:TextBox ID="tbxUserCd" runat="server" MaxLength="20"></asp:TextBox>
 
                     <label for="tbxPassword">密码</label>
-                    <asp:TextBox ID="tbxPassword" runat="server" MaxLength="20" TextMode="Password" title="密码（半角英数字）" Text="1"></asp:TextBox>
+                    <asp:TextBox ID="tbxPassword" runat="server" MaxLength="20" TextMode="Password" ></asp:TextBox>
                 </div>
-
+                <div>
+                    <br />
+                </div>
                 <div class="login-actions">
                     <input id="Reset1" type="reset" value="重置" class="login-btn" />
                     <asp:Button ID="btnLogin" runat="server" Text="登录" CssClass="login-btn login-submit" OnClientClick="return CheckLoginInput();" />
