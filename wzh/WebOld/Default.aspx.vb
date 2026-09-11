@@ -1,12 +1,10 @@
-﻿Imports UserControls
-
-Partial Class _Default
+﻿Partial Class _Default
     Inherits System.Web.UI.Page
 
     Protected Sub btnLogin_Click(sender As Object, e As EventArgs) Handles btnLogin.Click
 
         Dim userDA As New UserDA
-        Dim userDt As Data.DataTable = UserDA.GetUser(Me.tbxUserCd.Text.Trim)
+        Dim userDt As Data.DataTable = userDA.GetUser(Me.tbxUserCd.Text.Trim)
 
         If userDt.Rows.Count <= 0 Then
             PageCom.ShowMsg2(Me.Page, "用户不存在", Me.tbxUserCd.ClientID)

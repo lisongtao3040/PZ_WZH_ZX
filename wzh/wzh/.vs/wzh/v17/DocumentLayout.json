@@ -1,24 +1,19 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\Github_lis3040\\PZ_WZH_ZX\\wzh\\wzh\\",
+  "WorkspaceRootPath": "D:\\Github\\lisongtao3040\\PZ_WZH_ZX\\wzh\\wzh\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{F9ED7CDF-3CAC-5456-AC6D-6C743E21BBD3}|D:\\Github_lis3040\\PZ_WZH_ZX\\wzh\\WebOld|d:\\github_lis3040\\pz_wzh_zx\\wzh\\webold\\web.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+      "AbsoluteMoniker": "D:0:0:{F9ED7CDF-3CAC-5456-AC6D-6C743E21BBD3}|D:\\Github\\lisongtao3040\\PZ_WZH_ZX\\wzh\\WebOld|d:\\github\\lisongtao3040\\pz_wzh_zx\\wzh\\webold\\fileserv.aspx.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{F9ED7CDF-3CAC-5456-AC6D-6C743E21BBD3}|D:\\Github_lis3040\\PZ_WZH_ZX\\wzh\\WebOld|d:\\github_lis3040\\pz_wzh_zx\\wzh\\webold\\t_check_list.aspx.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+      "AbsoluteMoniker": "D:0:0:{F9ED7CDF-3CAC-5456-AC6D-6C743E21BBD3}|D:\\Github\\lisongtao3040\\PZ_WZH_ZX\\wzh\\WebOld|d:\\github\\lisongtao3040\\pz_wzh_zx\\wzh\\webold\\default.aspx.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{F9ED7CDF-3CAC-5456-AC6D-6C743E21BBD3}|D:\\Github_lis3040\\PZ_WZH_ZX\\wzh\\WebOld|d:\\github_lis3040\\pz_wzh_zx\\wzh\\webold\\t_check_list.aspx||{57312C73-6202-49E9-B1E1-40EA1A6DC1F6}"
+      "AbsoluteMoniker": "D:0:0:{F9ED7CDF-3CAC-5456-AC6D-6C743E21BBD3}|D:\\Github\\lisongtao3040\\PZ_WZH_ZX\\wzh\\WebOld|d:\\github\\lisongtao3040\\pz_wzh_zx\\wzh\\webold\\app_code\\comddl.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{F9ED7CDF-3CAC-5456-AC6D-6C743E21BBD3}|D:\\Github_lis3040\\PZ_WZH_ZX\\wzh\\WebOld|d:\\github_lis3040\\pz_wzh_zx\\wzh\\webold\\t_fulltraylist.aspx.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{F9ED7CDF-3CAC-5456-AC6D-6C743E21BBD3}|D:\\Github_lis3040\\PZ_WZH_ZX\\wzh\\WebOld|d:\\github_lis3040\\pz_wzh_zx\\wzh\\webold\\app_code\\da\\t_checkda.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{F9ED7CDF-3CAC-5456-AC6D-6C743E21BBD3}|D:\\Github_lis3040\\PZ_WZH_ZX\\wzh\\WebOld|d:\\github_lis3040\\pz_wzh_zx\\wzh\\webold\\app_themes\\css\\main.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+      "AbsoluteMoniker": "D:0:0:{94FBD012-6744-439B-A23A-890E09D7E4C7}|SqlHelper\\SqlHelper.vbproj|d:\\github\\lisongtao3040\\pz_wzh_zx\\wzh\\wzh\\sqlhelper\\sqlhelper.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
+      "RelativeMoniker": "D:0:0:{94FBD012-6744-439B-A23A-890E09D7E4C7}|SqlHelper\\SqlHelper.vbproj|solutionrelative:sqlhelper\\sqlhelper.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
     }
   ],
   "DocumentGroupContainers": [
@@ -28,19 +23,46 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 0,
           "Children": [
             {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "FileServ.aspx.vb",
+              "DocumentMoniker": "D:\\Github\\lisongtao3040\\PZ_WZH_ZX\\wzh\\WebOld\\FileServ.aspx.vb",
+              "RelativeDocumentMoniker": "..\\WebOld\\FileServ.aspx.vb",
+              "ToolTip": "D:\\Github\\lisongtao3040\\PZ_WZH_ZX\\wzh\\WebOld\\FileServ.aspx.vb",
+              "RelativeToolTip": "..\\WebOld\\FileServ.aspx.vb",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2026-09-11T02:10:12.52Z",
+              "EditorCaption": ""
             },
             {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{b1e99781-ab81-11d0-b683-00aa00a3ee26}"
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Default.aspx.vb",
+              "DocumentMoniker": "D:\\Github\\lisongtao3040\\PZ_WZH_ZX\\wzh\\WebOld\\Default.aspx.vb",
+              "RelativeDocumentMoniker": "..\\WebOld\\Default.aspx.vb",
+              "ToolTip": "D:\\Github\\lisongtao3040\\PZ_WZH_ZX\\wzh\\WebOld\\Default.aspx.vb",
+              "RelativeToolTip": "..\\WebOld\\Default.aspx.vb",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2026-09-11T02:10:06.424Z",
+              "EditorCaption": ""
             },
             {
-              "$type": "Bookmark",
-              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "SqlHelper.vb",
+              "DocumentMoniker": "D:\\Github\\lisongtao3040\\PZ_WZH_ZX\\wzh\\wzh\\SqlHelper\\SqlHelper.vb",
+              "RelativeDocumentMoniker": "SqlHelper\\SqlHelper.vb",
+              "ToolTip": "D:\\Github\\lisongtao3040\\PZ_WZH_ZX\\wzh\\wzh\\SqlHelper\\SqlHelper.vb",
+              "RelativeToolTip": "SqlHelper\\SqlHelper.vb",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2026-09-11T02:08:37.99Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Bookmark",
@@ -48,106 +70,28 @@
             },
             {
               "$type": "Bookmark",
-              "Name": "ST:0:0:{e5c86464-96be-4d7c-9a8b-abcb3bbf5f92}"
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Web.config",
-              "DocumentMoniker": "D:\\Github_lis3040\\PZ_WZH_ZX\\wzh\\WebOld\\Web.config",
-              "RelativeDocumentMoniker": "..\\WebOld\\Web.config",
-              "ToolTip": "D:\\Github_lis3040\\PZ_WZH_ZX\\wzh\\WebOld\\Web.config",
-              "RelativeToolTip": "..\\WebOld\\Web.config",
-              "ViewState": "AgIAAAAAAAAAAAAAAADwvwcAAABrAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000601|",
-              "WhenOpened": "2026-09-09T06:07:26.243Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "t_checkDA.vb",
-              "DocumentMoniker": "D:\\Github_lis3040\\PZ_WZH_ZX\\wzh\\WebOld\\App_Code\\DA\\t_checkDA.vb",
-              "RelativeDocumentMoniker": "..\\WebOld\\App_Code\\DA\\t_checkDA.vb",
-              "ToolTip": "D:\\Github_lis3040\\PZ_WZH_ZX\\wzh\\WebOld\\App_Code\\DA\\t_checkDA.vb",
-              "RelativeToolTip": "..\\WebOld\\App_Code\\DA\\t_checkDA.vb",
-              "ViewState": "AgIAAA0HAAAAAAAAAAAMwBkHAABjAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
-              "WhenOpened": "2026-09-09T06:04:09.958Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "t_check_list.aspx.vb",
-              "DocumentMoniker": "D:\\Github_lis3040\\PZ_WZH_ZX\\wzh\\WebOld\\t_check_list.aspx.vb",
-              "RelativeDocumentMoniker": "..\\WebOld\\t_check_list.aspx.vb",
-              "ToolTip": "D:\\Github_lis3040\\PZ_WZH_ZX\\wzh\\WebOld\\t_check_list.aspx.vb",
-              "RelativeToolTip": "..\\WebOld\\t_check_list.aspx.vb",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAwAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
-              "WhenOpened": "2026-09-09T06:00:44.86Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "Main.css",
-              "DocumentMoniker": "D:\\Github_lis3040\\PZ_WZH_ZX\\wzh\\WebOld\\App_Themes\\Css\\Main.css",
-              "RelativeDocumentMoniker": "..\\WebOld\\App_Themes\\Css\\Main.css",
-              "ToolTip": "D:\\Github_lis3040\\PZ_WZH_ZX\\wzh\\WebOld\\App_Themes\\Css\\Main.css",
-              "RelativeToolTip": "..\\WebOld\\App_Themes\\Css\\Main.css",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAARAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
-              "WhenOpened": "2026-09-09T05:55:32.421Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{b1e99781-ab81-11d0-b683-00aa00a3ee26}"
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "t_check_list.aspx",
-              "DocumentMoniker": "D:\\Github_lis3040\\PZ_WZH_ZX\\wzh\\WebOld\\t_check_list.aspx",
-              "RelativeDocumentMoniker": "..\\WebOld\\t_check_list.aspx",
-              "ToolTip": "D:\\Github_lis3040\\PZ_WZH_ZX\\wzh\\WebOld\\t_check_list.aspx",
-              "RelativeToolTip": "..\\WebOld\\t_check_list.aspx",
-              "LogicalView": "7651a703-06e5-11d1-8ebd-00a0c90f26ea",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000195|",
-              "WhenOpened": "2026-09-09T05:36:08.132Z",
-              "EditorCaption": ""
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "Orientation": 0,
-      "VerticalTabListWidth": 256,
-      "FloatingWindowState": {
-        "Id": "8da5d068-30be-4f7b-82ca-c27fda2d57a1",
-        "Display": 1,
-        "X": 28,
-        "Y": 330,
-        "Width": 1479,
-        "Height": 829,
-        "WindowState": 0
-      },
-      "DocumentGroups": [
-        {
-          "DockedWidth": 200,
-          "SelectedChildIndex": 0,
-          "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "t_FullTrayList.aspx.vb",
-              "DocumentMoniker": "D:\\Github_lis3040\\PZ_WZH_ZX\\wzh\\WebOld\\t_FullTrayList.aspx.vb",
-              "RelativeDocumentMoniker": "..\\WebOld\\t_FullTrayList.aspx.vb",
-              "ToolTip": "D:\\Github_lis3040\\PZ_WZH_ZX\\wzh\\WebOld\\t_FullTrayList.aspx.vb",
-              "RelativeToolTip": "..\\WebOld\\t_FullTrayList.aspx.vb",
-              "ViewState": "AgIAAAAAAAAAAAAAAADwvyIAAAAZAAAAAAAAAA==",
+              "Title": "ComDDL.vb",
+              "DocumentMoniker": "D:\\Github\\lisongtao3040\\PZ_WZH_ZX\\wzh\\WebOld\\App_Code\\ComDDL.vb",
+              "RelativeDocumentMoniker": "..\\WebOld\\App_Code\\ComDDL.vb",
+              "ToolTip": "D:\\Github\\lisongtao3040\\PZ_WZH_ZX\\wzh\\WebOld\\App_Code\\ComDDL.vb",
+              "RelativeToolTip": "..\\WebOld\\App_Code\\ComDDL.vb",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAALUAAAAWAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
-              "WhenOpened": "2026-09-09T06:01:14.379Z",
+              "WhenOpened": "2026-09-11T02:08:28.125Z",
               "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
             }
           ]
         }

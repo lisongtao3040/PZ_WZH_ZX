@@ -195,19 +195,36 @@ function esc(str) {
     return $('<div>').text(str).html();
 }
 
-// ===== 行视图渲染（单行表：台车号/生产线/订单号/CD/储备计划/初检/三方/操作）=====
+// CD 按 “-” 分段：各段使用不同颜色
+var FTL_CD_COLORS = ['#00008B', '#C00000', '#006400', '#8B008B', '#B8860B', '#008B8B'];
+function renderCdColored(cd) {
+    if (cd === null || cd === undefined || cd === '') return '';
+    var parts = String(cd).split('-');
+    var html = '';
+    for (var i = 0; i < parts.length; i++) {
+        if (i > 0) html += '-';
+        html += '<span style="color:' + FTL_CD_COLORS[i % FTL_CD_COLORS.length] + '">' + esc(parts[i]) + '</span>';
+    }
+    return html;
+}
+
+// ===== 行视图渲染（单行表：台车号/站点号/生产线号+CD/生产线名/工单号/储备计划/初检/三方/操作）=====
 function renderRowView(data) {
     var g = groupByTray(data);
     var html = '<table class="ftl-row-table"><colgroup>' +
         '<col class="col-tray-id"/>' +
-        '<col class="col-line"/><col class="col-order"/>' +
-        '<col class="col-cd"/><col class="col-bian"/>' +
+        '<col class="col-station"/>' +
+        '<col class="col-line-cd"/>' +
+        '<col class="col-line-name"/>' +
+        '<col class="col-order"/>' +
+        '<col class="col-bian"/>' +
         '<col class="col-first"/><col class="col-third"/>' +
         '<col class="col-action"/>' +
         '</colgroup>' +
         '<thead><tr>' +
-        '<th>台车号</th><th>生产线</th><th>订单号</th>' +
-        '<th class="ftl-sort-cd" onclick="toggleCdSort()" title="点击按CD排序">CD <span class="ftl-sort-arrow">' + (ftlCdDir === 1 ? '▲' : (ftlCdDir === -1 ? '▼' : '⇅')) + '</span></th><th>储备计划</th><th>初检</th><th>三方</th><th>操作</th>' +
+        '<th>台车号</th><th>站点号</th>' +
+        '<th class="ftl-sort-cd" onclick="toggleCdSort()" title="点击按CD排序">生产线号/CD <span class="ftl-sort-arrow">' + (ftlCdDir === 1 ? '▲' : (ftlCdDir === -1 ? '▼' : '⇅')) + '</span></th>' +
+        '<th>生产线名</th><th>工单号</th><th>储备计划</th><th>初检</th><th>三方</th><th>操作</th>' +
         '</tr></thead>' +
         '<tbody>';
 
@@ -224,10 +241,14 @@ function renderRowView(data) {
                 html += '<button type="button" class="ftl-btn-call" onclick="callAgv(\'' + esc(groupKey) + '\',\'' + esc(item.stationNo) + '\',this)">呼叫</button>';
                 html += '</td>';
             }
-            html += '<td>' + esc(item.lineCodeShort) + (item.line_name ? '(' + esc(item.line_name) + ')' : '') + '</td>';
+            html += '<td>' + esc(item.stationNo) + '</td>';
+            html += '<td class="ftl-cell-linecd">' +
+                '<div class="ftl-linecd-code">' + esc(item.lineCodeShort) + '</div>' +
+                '<div class="ftl-linecd-cd">' + renderCdColored(item.sapCode) + '</div>' +
+                '</td>';
+            html += '<td>' + esc(item.line_name) + '</td>';
             var isBianBichu = (item.bianCode && item.bianCode.indexOf('備蓄') >= 0);
             html += '<td>' + esc(item.OrderNo) + '</td>';
-            html += '<td>' + esc(item.sapCode) + '</td>';
             html += '<td' + (isBianBichu ? ' class="ftl-bian-bichu"' : '') + '>' + (isBianBichu ? '備蓄': '') + '</td>';
             html += '<td>' + esc(item.firstCheck) + '</td>';
             html += '<td>' + esc(item.thirdParty) + '</td>';
@@ -245,7 +266,7 @@ function renderRowView(data) {
     $('#rowViewBody').html(html);
 }
 
-// ===== 面板视图渲染（台车号/生产线/订单号/CD/储备计划/初检/三方 + 操作）=====
+// ===== 面板视图渲染（台车号/站点号/生产线号/生产线名/工单号/CD/储备计划/初检/三方 + 操作）=====
 function renderPanelView(data) {
     var g = groupByTray(data);
     var html = '';
@@ -263,9 +284,12 @@ function renderPanelView(data) {
             var isOK = (item.result && item.result.trim() === 'OK');
             var isBianBichu = (item.bianCode && item.bianCode.indexOf('備蓄') >= 0);
             html += '<div class="ftl-panel-item">';
-            html += panelRow('生产线', item.lineCodeShort);
-            html += panelRow('订单号', item.OrderNo);
-            html += panelRow('CD', item.sapCode);
+            html += panelRow('站点号', item.stationNo);
+            html += panelRow('生产线号', item.lineCodeShort, 'font-family:Arial Black,Segoe UI Black,Impact,JetBrainsMono-ExtraBold,sans-serif;font-size:24px;font-weight:900;letter-spacing:1px;color:#B8860B;');
+            html += panelRow('生产线名', item.line_name);
+            html += panelRow('工单号', item.OrderNo);
+            html += '<div class="ftl-panel-row"><span class="ftl-panel-label">CD:</span>' +
+                '<span class="ftl-panel-val ftl-panel-cd">' + renderCdColored(item.sapCode) + '</span></div>';
             html += '<div class="ftl-panel-row"><span class="ftl-panel-label">配送便别:</span><span class="ftl-panel-val' + (isBianBichu ? ' ftl-bian-bichu' : '') + '">' + (isBianBichu ? '備蓄': '') + '</span></div>';
             html += panelRow('初检', item.firstCheck);
             html += panelRow('三方', item.thirdParty);

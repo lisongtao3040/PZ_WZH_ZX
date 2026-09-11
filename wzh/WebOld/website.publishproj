@@ -52,6 +52,10 @@ Copyright (C) Microsoft Corporation. All rights reserved.
       <Project>{B52D0437-18CB-4B59-A135-485633FC2E20}</Project>
       <Name>UserControls</Name>
     </ProjectReference>
+    <ProjectReference Include="..\wzh\SqlHelper\SqlHelper.vbproj">
+      <Project>{94FBD012-6744-439B-A23A-890E09D7E4C7}</Project>
+      <Name>SqlHelper</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(_WebPublishTargetsPath)\Web\Microsoft.WebSite.Publishing.targets" />
 </Project>

@@ -1,0 +1,10 @@
+﻿<?xml version="1.0"?>
+<!-- 
+  Visual Studio global web project settings.
+-->
+<VisualWebDeveloper>
+
+  <comReferences>
+    <reference Name="interop.msscriptcontrol" ID="{0E59F1D2-1FBE-11D0-8FF2-00A0D10038BC}\1.0\0"/>
+  </comReferences>
+</VisualWebDeveloper>
