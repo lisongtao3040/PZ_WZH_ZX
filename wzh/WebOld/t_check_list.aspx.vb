@@ -753,11 +753,13 @@ Partial Class t_check_list
     End Function
 
     '删除按钮状态
-    Public Function GetDelBtnDisabled(ByVal ck_id As String) As String
+    Public Function GetDelBtnDisabled(ByVal ck_id As String, ByVal chk_user As String) As String
         If ck_id = String.Empty Then
             Return String.Empty
         Else
             If CLoginInfo.authority = "1" Then
+                Return "<input type=""button"" value=""删除"" class=""btn_common_new"" onclick=""Del('" & ck_id & "')"""
+            ElseIf CLoginInfo.user_cd = chk_user Then
                 Return "<input type=""button"" value=""删除"" class=""btn_common_new"" onclick=""Del('" & ck_id & "')"""
             Else
                 Return String.Empty

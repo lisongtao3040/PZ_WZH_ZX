@@ -227,7 +227,7 @@
 
                         <asp:TemplateField HeaderText="谨慎使用">
                             <ItemTemplate>
-                                <%# GetDelBtnDisabled(Eval("ck_id").ToString)%>
+                                <%# GetDelBtnDisabled(Eval("ck_id").ToString,Eval("chk_user").ToString)%>
                             </ItemTemplate>
                             <ItemStyle />
                         </asp:TemplateField>
