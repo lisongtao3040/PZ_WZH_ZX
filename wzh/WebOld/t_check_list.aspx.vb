@@ -324,26 +324,26 @@ Partial Class t_check_list
         Me.btnNewChk.Enabled = dtByPlan.Rows.Count > 0 AndAlso cd.Trim <> "" AndAlso no.Trim <> ""
 
         Dim tezhu_Kbn As Boolean = False
-        If dtByPlan.Rows.Count > 0 Then
-            ViewState("yotei_chk_date") = dtByPlan.Rows(0).Item("yotei_chk_date")
-            ViewState("jxs_name") = dtByPlan.Rows(0).Item("jxs_name")
-            line_cd = dtByPlan.Rows(0).Item("line_cd")
+        'If dtByPlan.Rows.Count > 0 Then
+        '    ViewState("yotei_chk_date") = dtByPlan.Rows(0).Item("yotei_chk_date")
+        '    ViewState("jxs_name") = dtByPlan.Rows(0).Item("jxs_name")
+        '    line_cd = dtByPlan.Rows(0).Item("line_cd")
 
-            If dtByPlan.Rows(0).Item("specialBookNo").ToString.Trim = "" Then
-                lblGT.Text = "规格品"
-                lblGT.ForeColor = Drawing.Color.Blue
-                tezhu_Kbn = False
-            ElseIf dtByPlan.Rows(0).Item("specialBookNo").ToString.Trim = "-1" Then
-                lblGT.Text = "未知"
-                lblGT.ForeColor = Drawing.Color.Silver
-                tezhu_Kbn = False
-            Else
-                lblGT.Text = "特注品"
-                lblGT.ForeColor = Drawing.Color.Red
-                tezhu_Kbn = True
-            End If
+        '    If dtByPlan.Rows(0).Item("specialBookNo").ToString.Trim = "" Then
+        '        lblGT.Text = "规格品"
+        '        lblGT.ForeColor = Drawing.Color.Blue
+        '        tezhu_Kbn = False
+        '    ElseIf dtByPlan.Rows(0).Item("specialBookNo").ToString.Trim = "-1" Then
+        '        lblGT.Text = "未知"
+        '        lblGT.ForeColor = Drawing.Color.Silver
+        '        tezhu_Kbn = False
+        '    Else
+        '        lblGT.Text = "特注品"
+        '        lblGT.ForeColor = Drawing.Color.Red
+        '        tezhu_Kbn = True
+        '    End If
 
-        End If
+        'End If
 
         If line_cd.Trim = "" Then
             line_cd = CLoginInfo.line_cd
