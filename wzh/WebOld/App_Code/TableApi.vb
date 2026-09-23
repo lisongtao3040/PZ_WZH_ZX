@@ -634,29 +634,29 @@ Public Class TableApi
                 sb.AppendLine("WHERE RowNumber BETWEEN  " & ((pageIndex - 1) * OnePageRowCount + 1).ToString() & " AND " & ((pageIndex) * OnePageRowCount).ToString)
             End If
         ElseIf tableName = "v_A02_check_result_ms" Then
-            Dim where As String = GetSelWhere(tableName, rowValues)
-            Dim sql As String = Get_v_A02_check_result_msSql_DirectFragment(where, ((pageIndex - 1) * OnePageRowCount + 1).ToString(), ((pageIndex) * OnePageRowCount).ToString)
-            sb.Clear()
-            sb.AppendLine(sql)
-            'sb.AppendLine("SELECT ")
-            'sb.AppendLine(" '1' AS Del ,ROW_NUMBER() OVER (ORDER BY 检查日期YMD desc,id desc) AS RowNumber,*")
-            'sb.AppendLine("INTO #v_A02_check_result_ms ")
-            'sb.AppendLine("FROM v_A02_check_result_ms WHERE 1=1")
-            'sb.AppendLine(GetSelWhere(tableName, rowValues))
-            'sb.AppendLine(awaysWhere)
-            'sb.AppendLine(" order by 检查日期YMD desc")
+            'Dim where As String = GetSelWhere(tableName, rowValues)
+            'Dim sql As String = Get_v_A02_check_result_msSql_DirectFragment(where, ((pageIndex - 1) * OnePageRowCount + 1).ToString(), ((pageIndex) * OnePageRowCount).ToString)
+            'sb.Clear()
+            'sb.AppendLine(sql)
+            sb.AppendLine(" SELECT ")
+            sb.AppendLine(" '1' AS Del ,ROW_NUMBER() OVER (ORDER BY 检查日期YMD desc,id desc) AS RowNumber,*")
+            sb.AppendLine("INTO #v_A02_check_result_ms ")
+            sb.AppendLine("FROM v_A02_check_result_ms WHERE 1=1")
+            sb.AppendLine(GetSelWhere(tableName, rowValues))
+            sb.AppendLine(awaysWhere)
+            sb.AppendLine(" order by 检查日期YMD desc")
 
+            sb.AppendLine(" ")
+            sb.AppendLine(" SELECT COUNT(*) as cnt FROM v_A02_check_result_ms  WHERE 1=1")
+            sb.AppendLine(GetSelWhere(tableName, rowValues))
+            sb.AppendLine(awaysWhere)
 
-            'sb.AppendLine("SELECT COUNT(*) as cnt FROM v_A02_check_result_ms  WHERE 1=1")
-            'sb.AppendLine(GetSelWhere(tableName, rowValues))
-            'sb.AppendLine(awaysWhere)
+            sb.AppendLine(" SELECT *")
+            sb.AppendLine("FROM #v_A02_check_result_ms ")
 
-            'sb.AppendLine("SELECT *")
-            'sb.AppendLine("FROM #v_A02_check_result_ms ")
-
-            'If pageIndex >= 0 Then
-            '    sb.AppendLine("WHERE RowNumber BETWEEN  " & ((pageIndex - 1) * OnePageRowCount + 1).ToString() & " AND " & ((pageIndex) * OnePageRowCount).ToString)
-            'End If
+            If pageIndex >= 0 Then
+                sb.AppendLine("WHERE RowNumber BETWEEN  " & ((pageIndex - 1) * OnePageRowCount + 1).ToString() & " AND " & ((pageIndex) * OnePageRowCount).ToString)
+            End If
 
 
         ElseIf tableName = "v_A03_mi_check_result" Then
@@ -702,12 +702,30 @@ Public Class TableApi
 
 
         End If
+        Dim ds As DataSet
+        'If tableName = "v_A02_check_result_ms" Then
+        '    Dim d As DataSet = FillDataDs(DataAccessManager.ConnStr, CommandType.Text, sb.ToString())
 
+        '    Dim dt0 As New DataTable
+        '    dt0.TableName = "CNT"
+        '    dt0.Columns.Add("cnt")
+        '    Dim dr As DataRow = dt0.NewRow
+        '    dr.Item(0) = d.Tables(0)
+        '    dt0.Rows.Add()
 
-        Dim ds As DataSet = FillDataDs(DataAccessManager.ConnStr, CommandType.Text, sb.ToString())
+        'Else
+        '    ds = FillDataDs(DataAccessManager.ConnStr, CommandType.Text, sb.ToString())
+        '    ds.Tables(0).TableName = "CNT"
+        '    ds.Tables(1).TableName = "MS"
+        '    sb.Length = 0
+
+        'End If
+
+        ds = FillDataDs(DataAccessManager.ConnStr, CommandType.Text, sb.ToString())
         ds.Tables(0).TableName = "CNT"
         ds.Tables(1).TableName = "MS"
         sb.Length = 0
+
         '返回 行数 与 明细 的 DS
         'Dim ds As New DataSet
         'ds.Tables.Add(cnt)

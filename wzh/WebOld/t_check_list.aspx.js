@@ -84,14 +84,14 @@ function ChooseRow(e, cd, no, jxs_name) {
 
 
     if ($(e).attr("ck_id") != '' && $(e).attr("chk_zumi") == '1') {
-        $("#btnSetDefault").removeAttr("disabled");
+        //$("#btnSetDefault").removeAttr("disabled");
     } else {
 
-        $("#btnSetDefault").attr("disabled", "true");
+        //$("#btnSetDefault").attr("disabled", "true");
     }
 
     if ($(e).text().indexOf("初①") != -1 || $(e).text().indexOf("初②") != -1) {
-        $("#btnSetDefault").attr("disabled", "true");
+        //$("#btnSetDefault").attr("disabled", "true");
     }
 
     if ($(e).text().indexOf("初①") != -1) {

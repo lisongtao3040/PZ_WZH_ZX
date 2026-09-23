@@ -15,12 +15,39 @@
     <link href="./App_Themes/Css/Main.css?randomId=<%=PageCom.GetYmdhmsf()%>" rel="stylesheet" type="text/css" />
     <script type="text/javascript" src="./Js/Main.js?randomId=<%=PageCom.GetYmdhmsf()%>"></script>
     <link rel="stylesheet" href="./t_BuliangList.css?randomId=1" />
-    <title></title>
+    
+    
+    <script>
+$(document).ready(function () {
+// 1. 设置初始秒数
+var timeLeft = 60; 
+var timerElement = document.getElementById('timer');
+
+// 2. 开启定时器，每 1000 毫秒（1秒）执行一次
+var countdown = setInterval(function() {
+    timeLeft--; // 秒数减 1
+    timerElement.innerText = timeLeft; // 更新页面显示
+
+    // 3. 当倒计时到达 0 时，停止定时器
+    if (timeLeft <= 0) {
+        clearInterval(countdown); // 销毁定时器
+        timerElement.innerText = "0";
+        $("#btnSel").click();
+        // 可以在这里添加倒计时结束后的逻辑，比如让按钮重新变得可点击
+        // document.getElementById('timer').parentNode.innerHTML = "<button>重新获取</button>";
+    }
+}, 1000);
+
+});
+
+    </script>
+    <title>不良一览</title>
+    
 </head>
 <body>
     <form id="form1" runat="server">
         <div style="float: left; text-align: center; font-size: 40px; width: 100%; position: fixed; top: 0px; background-color: #c7eff3">
-            <span id="UserHeader_lblTitle">不良一览</span>
+            （<span id="UserHeader_lblTitle">不良一览</span>&nbsp;&nbsp;&nbsp;&nbsp;<span id="timer">60</span> 秒后刷新&nbsp;&nbsp; 部门：<asp:Label ID="lblBu" runat="server" Text=""></asp:Label>）
         </div>
 
         <div style="float: right;">

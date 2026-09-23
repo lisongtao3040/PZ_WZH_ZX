@@ -8,9 +8,12 @@ Partial Class t_BuliangList
 
 
             Dim department_cd As String = Request.QueryString("bu")
+            lblBu.Text = department_cd
             'Dim cd As String = Request.QueryString("cd")
             'Dim no As String = Request.QueryString("no")
             Dim rinei As String = Request.QueryString("rinei")
+
+
 
             If department_cd = "" Then
 
@@ -18,6 +21,7 @@ Partial Class t_BuliangList
                 department_cd = "'" & department_cd.Replace("-", "','") & "'"
             End If
             ViewState("department_cd") = department_cd
+
 
             '加载日内列表
             HiListInit(Me.ddlHiinai)

@@ -37,10 +37,6 @@
                 <asp:CheckBox ID="cb4" runat="server" Text="4部" Checked="true" />
             </div>
 
-            <div style="background-color:aqua; width: 320px; height: 32px; vertical-align: middle;border-radius:4px;">
-                <a style="color: red; font-size: 22px">●</a>   [<asp:Label ID="lblGT" runat="server" Text="" Font-Size="20px" ForeColor="Red" Font-Bold="true"></asp:Label>]
-            </div>
-
         </div>
         <uc1:Header runat="server" ID="UserHeader" title="检查一览" />
 
@@ -52,7 +48,7 @@
                 <input type="button" id="btnClearTp" value="清空" />
                 <asp:Button ID="btnLst" runat="server" Text="新一览" Width="110px" />
 
-                <input type="button" id="btnScsj" value="实际" />
+                <input type="button" id="btnScsj" value="实际" style="display:none" />
                 <input type="button" id="btnBuliang" value="不良" />
                 <asp:Button ID="btnAutoOK" runat="server" Text="免检" Width="80" OnClientClick="if(confirm('真的要免检么？')){return true}else{return false}" />
 
@@ -78,10 +74,8 @@
 
                 <asp:Button ID="btnInputByHand" runat="server" Text="手入力" Width="120" />
                 <asp:Button ID="btnClear" runat="server" Text="清除" Width="100" />
-
                 <asp:Button ID="btnNewChkNoPlan" runat="server" Text="无计划新规" Width="170" />
-
-
+                <asp:Label ID="lblGT" runat="server" Text="" Font-Size="20px" ForeColor="Red" Font-Bold="true" style="display:none;"></asp:Label>
 
             </div>
 
@@ -195,8 +189,8 @@
                         <asp:TemplateField HeaderText="特注号<br />订单号<br />序号">
                             <ItemTemplate>
                                 <%#Left(Eval("specialBookNo").ToString, 14)%><br />
-                                <%#Left(Eval("sapOderNo").ToString, 14)%>/
-                                <%#Eval("sapIndexNo").ToString%>
+                                <%#Left(Eval("sapOderNo").ToString, 14)%><br />
+                                /<%#Eval("sapIndexNo").ToString%>
                             </ItemTemplate>
                         </asp:TemplateField>
                         <asp:TemplateField HeaderText="开始<br />结束时间">

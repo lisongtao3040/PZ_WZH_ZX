@@ -94,7 +94,7 @@ Partial Class t_check_list
     ''' <param name="ShowMsg">表示Msg</param>
     ''' <param name="tpNos">托盘Nos</param>
     Sub InitMs(Optional ByVal ShowMsg As Boolean = True, Optional ByVal tpNos As String = "")
-
+        lblGT.Text = ""
         '检索条件做成
         Dim cd As String = Me.tbxCd.Text.ToUpper.Trim '.Replace("-", "")
         Dim no As String = Me.tbxNo.Text.ToUpper.Trim
@@ -121,7 +121,7 @@ Partial Class t_check_list
         Me.btnNewChk.Enabled = False
 
         'tpNos = "'9017608139','9017398407','9017412844','9016580914'"
-        'tpNos = "'9018315047'"
+        'tpNos = "'9021802232'"
 
         'CD与工单没输入， 无计划新规按钮不可用
         If cd = "" AndAlso no = "" Then
@@ -324,26 +324,26 @@ Partial Class t_check_list
         Me.btnNewChk.Enabled = dtByPlan.Rows.Count > 0 AndAlso cd.Trim <> "" AndAlso no.Trim <> ""
 
         Dim tezhu_Kbn As Boolean = False
-        'If dtByPlan.Rows.Count > 0 Then
-        '    ViewState("yotei_chk_date") = dtByPlan.Rows(0).Item("yotei_chk_date")
-        '    ViewState("jxs_name") = dtByPlan.Rows(0).Item("jxs_name")
-        '    line_cd = dtByPlan.Rows(0).Item("line_cd")
+        If dtByPlan.Rows.Count > 0 Then
+            ViewState("yotei_chk_date") = dtByPlan.Rows(0).Item("yotei_chk_date")
+            ViewState("jxs_name") = dtByPlan.Rows(0).Item("jxs_name")
+            line_cd = dtByPlan.Rows(0).Item("line_cd")
 
-        '    If dtByPlan.Rows(0).Item("specialBookNo").ToString.Trim = "" Then
-        '        lblGT.Text = "规格品"
-        '        lblGT.ForeColor = Drawing.Color.Blue
-        '        tezhu_Kbn = False
-        '    ElseIf dtByPlan.Rows(0).Item("specialBookNo").ToString.Trim = "-1" Then
-        '        lblGT.Text = "未知"
-        '        lblGT.ForeColor = Drawing.Color.Silver
-        '        tezhu_Kbn = False
-        '    Else
-        '        lblGT.Text = "特注品"
-        '        lblGT.ForeColor = Drawing.Color.Red
-        '        tezhu_Kbn = True
-        '    End If
+            If dtByPlan.Rows(0).Item("specialBookNo").ToString.Trim = "" Then
+                'lblGT.Text = "规格品"
+                'lblGT.ForeColor = Drawing.Color.Blue
+                tezhu_Kbn = False
+            ElseIf dtByPlan.Rows(0).Item("specialBookNo").ToString.Trim = "-1" Then
+                'lblGT.Text = "未知"
+                'lblGT.ForeColor = Drawing.Color.Silver
+                tezhu_Kbn = False
+            Else
+                'lblGT.Text = "特注品"
+                'lblGT.ForeColor = Drawing.Color.Red
+                tezhu_Kbn = True
+            End If
 
-        'End If
+        End If
 
         If line_cd.Trim = "" Then
             line_cd = CLoginInfo.line_cd
@@ -359,6 +359,7 @@ Partial Class t_check_list
             If dt.Rows.Count > 0 Then
                 If dt.Rows(0).Item("buliang_daiti") <> "0" Then
                     lblGT.Text = lblGT.Text & "  不良替代品"
+                    PageCom.ShowMsg3(Page, "不良替代品 ",, "green")
                 End If
             End If
 
@@ -422,21 +423,6 @@ Partial Class t_check_list
                 End If
 
             End If
-
-            'If sameCdDt.Select("no='" & ViewState("no").ToString & "' and status<>'4'").Length > 0 Then
-            '    ViewState("ck_id_forSetDefault") = sameCdDt.Select("no='" & ViewState("no").ToString & "' and status<>'4'")(0).Item("ck_id").ToString
-            '    Me.btnSetDefault.Enabled = True
-            '    PageCom.ShowMsg2(Page, "当日已经检查")
-            'Else
-            '    If sameCdDt.Select("status<>'4'").Length > 0 Then
-            '        ViewState("ck_id_forSetDefault") = sameCdDt.Select("status<>'4'")(0).Item("ck_id").ToString
-            '        Me.btnSetDefault.Enabled = True
-            '        PageCom.ShowMsg2(Page, "当日已经检查")
-            '    Else
-            '        Me.btnSetDefault.Enabled = False
-            '    End If
-            'End If
-
         Else
         End If
 
