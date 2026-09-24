@@ -1,0 +1,40 @@
+﻿/* ===== t_FullTrayListPZ.aspx 专用样式 =====
+   本画面のレイアウトは t_FullTrayList.aspx と完全に同じため、
+   既存スタイルシートを取り込んで流用する（既存ファイルは変更しない）。
+   PZ 画面（11項目の一覧）専用の上書きだけを、この下に書く。 */
+@import url("./t_FullTrayList.aspx.css");
+
+/* ===== 行视图テーブル：11列（列幅合計 1120px）=====
+   既存 .ftl-row-table は9列用の 1180px 固定なので上書きする */
+.ftl-row-table { width: 1120px; }
+
+.ftlpz-col-tray    { width: 100px; }  /* 台车号（セル結合） */
+.ftlpz-col-dept    { width: 80px; }   /* 部门 */
+.ftlpz-col-station { width: 70px; }   /* 站点号 */
+.ftlpz-col-opline  { width: 70px; }   /* 操作线 */
+.ftlpz-col-cd      { width: 300px; }  /* 商品CD */
+.ftlpz-col-amount  { width: 60px; }   /* 数量 */
+.ftlpz-col-dest    { width: 80px; }   /* 目的地 */
+.ftlpz-col-bian    { width: 90px; }   /* 储备计划（備蓄のみ表示） */
+.ftlpz-col-order   { width: 110px; }  /* 工单号 */
+.ftlpz-col-jizhong { width: 80px; }   /* 机种 */
+.ftlpz-col-line    { width: 80px; }   /* 生产线号 */
+
+/* 商品CD：英字・極太・濃紺（セグメント色は renderCdColored が指定） */
+.ftl-row-table td.ftlpz-cell-cd {
+    font-family: 'Arial Black', 'Segoe UI Black', Impact, JetBrainsMono-ExtraBold, sans-serif;
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    color: #00008B;
+}
+
+/* 生产线号：英数字・極太・黄土色 */
+.ftl-row-table td.ftlpz-cell-line {
+    font-family: 'Arial Black', 'Segoe UI Black', Impact, JetBrainsMono-ExtraBold, sans-serif;
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    color: #B8860B;
+    text-align: center;
+}

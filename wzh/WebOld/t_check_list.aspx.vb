@@ -813,10 +813,10 @@ Partial Class t_check_list
 
     End Sub
 
-    Private Sub btnLst_Click(sender As Object, e As EventArgs) Handles btnLst.Click
-        PageCom.SetInitParam(Page, Context, ViewState, CLoginInfo)
-        Server.Transfer("t_FullTrayList.aspx")
-    End Sub
+
+
+
+
 
     Private Sub btnAutoOK_Click(sender As Object, e As EventArgs) Handles btnAutoOK.Click
 
@@ -842,5 +842,14 @@ Partial Class t_check_list
             'Session("CLoginInfo") = CLoginInfo
             'Server.Transfer("t_check_ms.aspx")
         End If
+    End Sub
+    Private Sub btnLst_Click(sender As Object, e As EventArgs) Handles btnLst.Click
+        PageCom.SetInitParam(Page, Context, ViewState, CLoginInfo)
+        Server.Transfer("t_FullTrayList.aspx")
+    End Sub
+
+    Private Sub btnLst2_Click(sender As Object, e As EventArgs) Handles btnLst2.Click
+        PageCom.SetInitParam(Page, Context, ViewState, CLoginInfo)
+        Server.Transfer("t_FullTrayListPZ.aspx")
     End Sub
 End Class

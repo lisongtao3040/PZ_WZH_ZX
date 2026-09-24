@@ -112,9 +112,8 @@ function loadData() {
         success: function (response) {
             var res = JSON.parse(response.d);
             if (res.success) {
-                $('#lblStatus').text('共 ' + res.data.length + ' 条');
                 ftlData = res.data;
-                applyView();
+                applyView();   // 件数（共／储备）は applyView 内で表示する
             } else {
                 $('#lblStatus').text('加载失败：' + res.message);
             }
@@ -179,9 +178,23 @@ function applyView() {
         data = sortByCd(data, ftlCdDir);
     }
 
-    $('#lblStatus').text('共 ' + data.length + ' 条');
+    $('#lblStatus').text('共 ' + data.length + ' 条，储备 ' + countBichu(data) + ' 条');
     renderRowView(data);
     renderPanelView(data);
+}
+
+// 储备計画に「備蓄」を含むか（表示・件数カウントで共用）
+function hasBichu(item) {
+    return !!(item.bianCode && String(item.bianCode).indexOf('備蓄') >= 0);
+}
+
+// 「備蓄」を含む明細の件数（＝储备件数）
+function countBichu(data) {
+    var count = 0;
+    $.each(data, function (i, item) {
+        if (hasBichu(item)) count++;
+    });
+    return count;
 }
 
 // 点击“CD”表头：升序 → 降序 → 还原
@@ -247,7 +260,7 @@ function renderRowView(data) {
                 '<div class="ftl-linecd-cd">' + renderCdColored(item.sapCode) + '</div>' +
                 '</td>';
             html += '<td>' + esc(item.line_name) + '</td>';
-            var isBianBichu = (item.bianCode && item.bianCode.indexOf('備蓄') >= 0);
+            var isBianBichu = hasBichu(item);
             html += '<td>' + esc(item.OrderNo) + '</td>';
             html += '<td' + (isBianBichu ? ' class="ftl-bian-bichu"' : '') + '>' + (isBianBichu ? '備蓄': '') + '</td>';
             html += '<td>' + esc(item.firstCheck) + '</td>';
@@ -282,7 +295,7 @@ function renderPanelView(data) {
 
         $.each(items, function (j, item) {
             var isOK = (item.result && item.result.trim() === 'OK');
-            var isBianBichu = (item.bianCode && item.bianCode.indexOf('備蓄') >= 0);
+            var isBianBichu = hasBichu(item);
             html += '<div class="ftl-panel-item">';
             html += panelRow('站点号', item.stationNo);
             html += panelRow('生产线号', item.lineCodeShort, 'font-family:Arial Black,Segoe UI Black,Impact,JetBrainsMono-ExtraBold,sans-serif;font-size:24px;font-weight:900;letter-spacing:1px;color:#B8860B;');

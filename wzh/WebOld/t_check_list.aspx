@@ -47,7 +47,7 @@
                 <asp:Button ID="btnTpChkList" runat="server" Text="托盘" Width="80px" />
                 <input type="button" id="btnClearTp" value="清空" />
                 <asp:Button ID="btnLst" runat="server" Text="新一览" Width="110px" />
-
+                <asp:Button ID="btnLst2" runat="server" Text="一览2" Width="110px" />
                 <input type="button" id="btnScsj" value="实际" style="display:none" />
                 <input type="button" id="btnBuliang" value="不良" />
                 <asp:Button ID="btnAutoOK" runat="server" Text="免检" Width="80" OnClientClick="if(confirm('真的要免检么？')){return true}else{return false}" />
