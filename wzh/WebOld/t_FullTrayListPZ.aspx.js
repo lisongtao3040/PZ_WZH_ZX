@@ -66,7 +66,8 @@ var FTL_COLUMNS = [
     { key: 'firstCheck',        label: '初检',     colClass: 'ftlpz-col-first' },
     { key: 'thirdParty',        label: '三方',     colClass: 'ftlpz-col-third' },
     // 操作列（ビューの項目ではない疑似項目：検査済み＝OK 以外のときだけボタンを出す）
-    { key: '__action',          label: '操作',     colClass: 'ftlpz-col-action' }
+    { key: '__action',          label: '操作',     colClass: 'ftlpz-col-action' },
+	{ key: '__result',          label: '结果',     colClass: 'ftlpz-col-result' }
 ];
 
 // 虚拟键盘：仅大写英文与数字
@@ -259,6 +260,8 @@ function renderRowView(data) {
             html += '<th>' + esc(col.label) + '</th>';
         }
     });
+
+	//html += '<th style="border:1px solid #aaa;">结果</th>';
     html += '</tr></thead><tbody>';
 
     // 台车号ごとに行をまとめ、先頭列（台车号）は rowspan でセル結合する
@@ -293,7 +296,20 @@ function cellHtml(col, item) {
     // 操作列：検査済み（OK）の行は何も出さない
     if (col.key === '__action') {
         return isCheckedOk(item) ? '<td></td>' : '<td>' + actionButtons(item) + '</td>';
-    }
+    
+	
+	}
+    if (col.key === '__result') {
+		if( GetResultTxt(item)=='OK'){
+			return '<td style="color:green">' + String(item.result).trim() + '</td>';
+		}else if( GetResultTxt(item)==''){
+			return '<td>未</td>';
+		}else{
+			return '<td>' + GetResultTxt(item) + '</td>';
+		}
+	}
+
+
 
     var val = (item[col.key] === null || item[col.key] === undefined) ? '' : item[col.key];
 
@@ -320,6 +336,17 @@ function cellHtml(col, item) {
 function isCheckedOk(item) {
     return !!(item.result && String(item.result).trim() === 'OK');
 }
+
+function GetResultTxt(item) {
+    if(String(item.result).trim() == ''){
+		return '未检';
+	}else if(String(item.result).trim() == '待'){
+		return '检查中';
+	}else{
+		return String(item.result).trim();
+	}
+}
+
 
 // 检查／自动OK ボタン（行ビューとパネルビューで共用）
 // CD＝商品CD(productCode)、NO＝工单号(OrderNo) を後台へ渡す
@@ -355,6 +382,9 @@ function renderPanelView(data) {
                     var bichu = hasBichu(item);
                     html += '<div class="ftl-panel-row"><span class="ftl-panel-label">' + esc(col.label) + ':</span>' +
                         '<span class="ftl-panel-val' + (bichu ? ' ftl-bian-bichu' : '') + '">' + (bichu ? '備蓄' : '') + '</span></div>';
+
+				} else if (col.key === '__result') {
+				    html += panelRow(col.label, GetResultTxt(item));
                 } else {
                     html += panelRow(col.label, val);
                 }
@@ -364,6 +394,8 @@ function renderPanelView(data) {
             if (!isCheckedOk(item)) {
                 html += '<div class="ftl-panel-actions">' + actionButtons(item) + '</div>';
             }
+
+			//html += '<div class="ftl-panel-actions">' + String(item.result).trim() + '</div>';
 
             html += '</div>'; // ftl-panel-item
         });
@@ -376,7 +408,15 @@ function renderPanelView(data) {
 
 function panelRow(label, val, style) {
     var styleAttr = style ? ' style="' + style + '"' : '';
-    return '<div class="ftl-panel-row"><span class="ftl-panel-label">' + esc(label) + ':</span><span class="ftl-panel-val"' + styleAttr + '>' + esc(val) + '</span></div>';
+	if(val=="OK"){
+		
+	    return '<div class="ftl-panel-row"><span class="ftl-panel-label">' + esc(label) + ':</span><span class="ftl-panel-val"' + styleAttr + ' style="color:green">' + esc(val) + '</span></div>';
+
+	}else{
+	    return '<div class="ftl-panel-row"><span class="ftl-panel-label">' + esc(label) + ':</span><span class="ftl-panel-val"' + styleAttr + '>' + esc(val) + '</span></div>';
+
+	}
+    //return '<div class="ftl-panel-row"><span class="ftl-panel-label">' + esc(label) + ':</span><span class="ftl-panel-val"' + styleAttr + '>' + esc(val) + '</span></div>';
 }
 
 // ===== 行/面板 视图切换 =====

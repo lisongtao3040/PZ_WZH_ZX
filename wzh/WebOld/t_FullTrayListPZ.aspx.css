@@ -21,6 +21,7 @@
 .ftlpz-col-first   { width: 60px; }   /* 初检 */
 .ftlpz-col-third   { width: 60px; }   /* 三方 */
 .ftlpz-col-action  { width: 200px; }  /* 操作（检查／自动OK） */
+.ftlpz-col-result  { width: 60px; }  /* 操作（检查／自动OK） */
 
 /* 操作线／商品CD の結合セルは既存 t_FullTrayList の .ftl-cell-linecd／.ftl-linecd-code／
    .ftl-linecd-cd をそのまま流用する（列幅のみ上で指定） */
