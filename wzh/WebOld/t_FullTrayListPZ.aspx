@@ -46,7 +46,20 @@
             <%-- 部門コード（例：（2））：ユーザー名の後ろに表示 --%>
             <asp:Label ID="lblUserDept" runat="server" Text=""></asp:Label>
             <span id="lblStatus" class="ftl-status"></span>
+            <asp:Label ID="lblMsg" runat="server" Text="" ForeColor="red"></asp:Label>
                
+        </div>
+
+        <%-- 検査／自动OK ボタン用：隠しフィールド＋サーバーボタン --%>
+        <asp:HiddenField ID="hid_chk_cd" runat="server" ClientIDMode="Static" />
+        <asp:HiddenField ID="hid_chk_no" runat="server" ClientIDMode="Static" />
+        <asp:HiddenField ID="hid_chk_tpno" runat="server" ClientIDMode="Static" />
+        <asp:Button ID="btnChkServer" runat="server" Text="" ClientIDMode="Static" Style="display:none;" />
+        <asp:Button ID="btnAutoOkServer" runat="server" Text="" ClientIDMode="Static" Style="display:none;" />
+        <br />
+        <%-- 自动OK 確認ダイアログ --%>
+        <div id="autoOkConfirmDialog" style="display:none;">
+            <p style="font-size:15px;margin:12px 0;">是否真的要自动OK？</p>
         </div>
 
         <article>

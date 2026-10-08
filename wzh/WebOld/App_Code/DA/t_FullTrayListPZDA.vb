@@ -41,7 +41,7 @@ Public Class t_FullTrayListPZDA
         sb.AppendLine("    ,[packageAmount]")
         sb.AppendLine("    ,[destination]")
         sb.AppendLine("    ,[BianCode]")
-        sb.AppendLine("    ,[Dn]")
+        sb.AppendLine("    ,[OrderNo]")
         sb.AppendLine("    ,[jizhong]")
         sb.AppendLine("    ,[lineCodeShort]")
         sb.AppendLine("FROM [v_TwoMetresFullTrayDetailPinzhi]")
@@ -54,6 +54,23 @@ Public Class t_FullTrayListPZDA
         sb.AppendLine("ORDER BY [stationNo], [existTrolleyNo]")
 
         Return FillData(DataAccessManager.TCMConnStr, CommandType.Text, sb.ToString(), "GetFullTrayListPinzhi")
+    End Function
+
+    ' t_check から no・result を取得（最新1件ずつ、工单号（OrderNo）の IN句で絞り込み）
+    Public Function GetCheckResult(ByVal nosInClause As String) As DataTable
+        Dim sb As New StringBuilder
+        sb.AppendLine("SELECT no, result")
+        sb.AppendLine("FROM (")
+        sb.AppendLine("    SELECT")
+        sb.AppendLine("        no")
+        sb.AppendLine("        ,result")
+        sb.AppendLine("        ,ROW_NUMBER() OVER(PARTITION BY REPLACE(cd, '-', ''), no ORDER BY ck_id DESC) AS rn")
+        sb.AppendLine("    FROM t_check")
+        sb.AppendLine("    WHERE no IN (" & nosInClause & ")")
+        sb.AppendLine(") t")
+        sb.AppendLine("WHERE rn = 1")
+
+        Return FillData(DataAccessManager.ConnStr, CommandType.Text, sb.ToString(), "GetCheckResult")
     End Function
 
 End Class

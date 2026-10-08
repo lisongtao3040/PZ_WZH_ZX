@@ -54,14 +54,19 @@ var FTL_COLUMNS = [
     { key: 'existTrolleyNo',    label: '台车号',   colClass: 'ftlpz-col-tray' },
     { key: 'stationDepartment', label: '部门',     colClass: 'ftlpz-col-dept' },
     { key: 'stationNo',         label: '站点号',   colClass: 'ftlpz-col-station' },
-    { key: 'operatorLine',      label: '操作线',   colClass: 'ftlpz-col-opline' },
-    { key: 'productCode',       label: '商品CD',   colClass: 'ftlpz-col-cd' },
+    // 操作线と商品CDは1列にまとめる（既存 t_FullTrayList の「生产线号/CD」と同じ作り）
+    { key: '__lineCd',          label: '操作线/CD', colClass: 'ftlpz-col-linecd', sortByCd: true },
     { key: 'packageAmount',     label: '数量',     colClass: 'ftlpz-col-amount' },
     { key: 'destination',       label: '目的地',   colClass: 'ftlpz-col-dest' },
     { key: 'BianCode',          label: '储备计划', colClass: 'ftlpz-col-bian' },
-    { key: 'Dn',                label: '工单号',   colClass: 'ftlpz-col-order' },
+    { key: 'OrderNo',           label: '工单号',   colClass: 'ftlpz-col-order' },
     { key: 'jizhong',           label: '机种',     colClass: 'ftlpz-col-jizhong' },
-    { key: 'lineCodeShort',     label: '生产线号', colClass: 'ftlpz-col-line' }
+    { key: 'lineCodeShort',     label: '生产线号', colClass: 'ftlpz-col-line' },
+    // 初检／三方（API が計算して返す項目：既存 t_FullTrayList と同じ判定）
+    { key: 'firstCheck',        label: '初检',     colClass: 'ftlpz-col-first' },
+    { key: 'thirdParty',        label: '三方',     colClass: 'ftlpz-col-third' },
+    // 操作列（ビューの項目ではない疑似項目：検査済み＝OK 以外のときだけボタンを出す）
+    { key: '__action',          label: '操作',     colClass: 'ftlpz-col-action' }
 ];
 
 // 虚拟键盘：仅大写英文与数字
@@ -246,8 +251,8 @@ function renderRowView(data) {
     });
     html += '</colgroup><thead><tr>';
     $.each(FTL_COLUMNS, function (i, col) {
-        if (col.key === 'productCode') {
-            // CD列：クリックで並べ替え
+        if (col.sortByCd) {
+            // CDを含む列：ヘッダクリックで並べ替え
             html += '<th class="ftl-sort-cd" onclick="toggleCdSort()" title="点击按CD排序">' +
                 esc(col.label) + ' <span class="ftl-sort-arrow">' + cdSortArrow() + '</span></th>';
         } else {
@@ -283,12 +288,21 @@ function cdSortArrow() {
     return (ftlCdDir === 1) ? '▲' : (ftlCdDir === -1 ? '▼' : '⇅');
 }
 
-// 1項目分の <td> を作る（CD は色分け、储备计划は「備蓄」のみ表示）
+// 1項目分の <td> を作る（CD は色分け、储备计划は「備蓄」のみ表示、操作列は按钮）
 function cellHtml(col, item) {
+    // 操作列：検査済み（OK）の行は何も出さない
+    if (col.key === '__action') {
+        return isCheckedOk(item) ? '<td></td>' : '<td>' + actionButtons(item) + '</td>';
+    }
+
     var val = (item[col.key] === null || item[col.key] === undefined) ? '' : item[col.key];
 
-    if (col.key === 'productCode') {
-        return '<td class="ftlpz-cell-cd">' + renderCdColored(val) + '</td>';
+    // 操作线／商品CD の結合セル（既存 t_FullTrayList の .ftl-cell-linecd と同じ作り）
+    if (col.key === '__lineCd') {
+        return '<td class="ftl-cell-linecd">' +
+            '<div class="ftl-linecd-code">' + esc(item.operatorLine) + '</div>' +
+            '<div class="ftl-linecd-cd">' + renderCdColored(item.productCode) + '</div>' +
+            '</td>';
     }
     if (col.key === 'lineCodeShort') {
         return '<td class="ftlpz-cell-line">' + esc(val) + '</td>';
@@ -302,7 +316,20 @@ function cellHtml(col, item) {
     return '<td>' + esc(val) + '</td>';
 }
 
-// ===== 面板视图渲染（台车号ごとにカード表示。台车号はカードヘッダ、其余10项目を表示。按钮なし）=====
+// 検査済み（OK）かどうか
+function isCheckedOk(item) {
+    return !!(item.result && String(item.result).trim() === 'OK');
+}
+
+// 检查／自动OK ボタン（行ビューとパネルビューで共用）
+// CD＝商品CD(productCode)、NO＝工单号(OrderNo) を後台へ渡す
+function actionButtons(item) {
+    var args = '\'' + esc(item.stationNo) + '\',\'' + esc(item.productCode) + '\',\'' + esc(item.OrderNo) + '\'';
+    return '<button type="button" class="ftl-btn-check" onclick="onCheckClick(' + args + ')">检查</button>' +
+        '<button type="button" class="ftl-btn-autook" onclick="onAutoOkClick(' + args + ')">自动OK</button>';
+}
+
+// ===== 面板视图渲染（台车号ごとにカード表示。台车号はカードヘッダ、其余10项目を表示）=====
 function renderPanelView(data) {
     var g = groupByTray(data);
     var html = '';
@@ -317,10 +344,12 @@ function renderPanelView(data) {
             html += '<div class="ftl-panel-item">';
             $.each(FTL_COLUMNS, function (k, col) {
                 if (col.key === 'existTrolleyNo') return; // 台车号はカードヘッダに表示済み
+                if (col.key === '__action') return;       // 操作はカード下部のボタンで表示
                 var val = (item[col.key] === null || item[col.key] === undefined) ? '' : item[col.key];
-                if (col.key === 'productCode') {
+                if (col.key === '__lineCd') {
+                    // 操作線（黄土色）＋商品CD（色分け）を1行で表示（行ビューの結合セルと同じ内容）
                     html += '<div class="ftl-panel-row"><span class="ftl-panel-label">' + esc(col.label) + ':</span>' +
-                        '<span class="ftl-panel-val ftl-panel-cd">' + renderCdColored(val) + '</span></div>';
+                        '<span class="ftl-panel-val ftl-panel-cd"><span class="ftlpz-panel-line">' + esc(item.operatorLine) + '</span> ' + renderCdColored(item.productCode) + '</span></div>';
                 } else if (col.key === 'BianCode') {
                     // 储备计划に「備蓄」を含む場合のみ「備蓄」と表示（既存 t_FullTrayList と同じ）
                     var bichu = hasBichu(item);
@@ -330,6 +359,12 @@ function renderPanelView(data) {
                     html += panelRow(col.label, val);
                 }
             });
+
+            // 操作（検査済み＝OK 以外のときだけ）
+            if (!isCheckedOk(item)) {
+                html += '<div class="ftl-panel-actions">' + actionButtons(item) + '</div>';
+            }
+
             html += '</div>'; // ftl-panel-item
         });
 
@@ -359,4 +394,39 @@ function toggleView() {
     }
 }
 
-// ===== 本画面は一覧表示のみ（呼出・検査・自動OK ボタンは持たない）=====
+// ===== 検査ボタン：隠しフィールド経由で Server.Transfer =====
+function onCheckClick(stationNo, sapCode, orderNo) {
+    document.getElementById('hid_chk_cd').value = sapCode;
+    document.getElementById('hid_chk_no').value = orderNo;
+    document.getElementById('btnChkServer').click();
+}
+
+// ===== 自动OK ボタン：確認後に後台専用関数を呼び出す =====
+function onAutoOkClick(stationNo, sapCode, orderNo) {
+    $('#autoOkConfirmDialog').data('params', { stationNo: stationNo, sapCode: sapCode, orderNo: orderNo });
+    $('#autoOkConfirmDialog').dialog({
+        title: '自动OK 确认',
+        modal: true,
+        width: 360,
+        resizable: false,
+        buttons: [
+            {
+                text: '确认',
+                'class': 'ftl-dlg-exec',
+                click: function () {
+                    var p = $(this).data('params');
+                    $(this).dialog('close');
+                    document.getElementById('hid_chk_cd').value = p.sapCode;
+                    document.getElementById('hid_chk_no').value = p.orderNo;
+                    document.getElementById('btnAutoOkServer').click();
+                }
+            },
+            {
+                text: '取消',
+                click: function () {
+                    $(this).dialog('close');
+                }
+            }
+        ]
+    });
+}

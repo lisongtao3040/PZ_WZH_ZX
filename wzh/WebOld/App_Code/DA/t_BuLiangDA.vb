@@ -525,6 +525,18 @@ Public Class t_BuLiangDA
         sb.AppendLine("WHERE ISNULL(a.specialBookNo,'') <> ''")
         If cd <> "" Then sb.AppendLine("  AND c.cd = '" & cd & "'")
         If no <> "" Then sb.AppendLine("  AND c.no = '" & no & "'")
+
+
+        If rinei <> "" Then
+            sb.AppendLine("  AND c.yotei_chk_date > DATEADD(day, -" & rinei & ", GETDATE())")
+            sb.AppendLine("  AND c.yotei_chk_date < DATEADD(day, " & rinei & ", GETDATE())")
+        End If
+        If department_cd.Trim <> "" Then
+            sb.AppendLine("  AND (c.department_cd IN (" & department_cd & ") OR ISNULL(c.department_cd,'') = '')")
+        End If
+
+
+
         sb.AppendLine(";")
 
         ' 2.2 加入 t_check (利用上一步的结果结合，符合双表规范)
@@ -560,6 +572,15 @@ Public Class t_BuLiangDA
         sb.AppendLine("WHERE ISNULL(a.specialBookNo,'') = ''")
         If cd <> "" Then sb.AppendLine("  AND c.cd = '" & cd & "'")
         If no <> "" Then sb.AppendLine("  AND c.no = '" & no & "'")
+
+        If rinei <> "" Then
+            sb.AppendLine("  AND c.yotei_chk_date > DATEADD(day, -" & rinei & ", GETDATE())")
+            sb.AppendLine("  AND c.yotei_chk_date < DATEADD(day, " & rinei & ", GETDATE())")
+        End If
+        If department_cd.Trim <> "" Then
+            sb.AppendLine("  AND (c.department_cd IN (" & department_cd & ") OR ISNULL(c.department_cd,'') = '')")
+        End If
+
         sb.AppendLine(";")
 
         ' 3.2 加入 t_check
