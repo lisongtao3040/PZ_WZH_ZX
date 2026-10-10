@@ -268,7 +268,7 @@ function renderRowView(data) {
             html += '<td>';
             if (!isOK) {
                 html += '<button type="button" class="ftl-btn-check" onclick="onCheckClick(\'' + esc(item.stationNo) + '\',\'' + esc(item.sapCode) + '\',\'' + esc(item.OrderNo) + '\')">检查</button>';
-                html += '<button type="button" class="ftl-btn-autook" onclick="onAutoOkClick(\'' + esc(item.stationNo) + '\',\'' + esc(item.sapCode) + '\',\'' + esc(item.OrderNo) + '\')">自动OK</button>';
+                html += '<button type="button" class="ftl-btn-autook" onclick="onAutoOkClick(\'' + esc(item.stationNo) + '\',\'' + esc(item.sapCode) + '\',\'' + esc(item.OrderNo) + '\')">赋合格</button>';
             }
             html += '</td>';
             html += '</tr>';
@@ -309,7 +309,7 @@ function renderPanelView(data) {
             if (!isOK) {
                 html += '<div class="ftl-panel-actions">';
                 html += '<button type="button" class="ftl-btn-check" onclick="onCheckClick(\'' + esc(item.stationNo) + '\',\'' + esc(item.sapCode) + '\',\'' + esc(item.OrderNo) + '\')">检查</button>';
-                html += '<button type="button" class="ftl-btn-autook" onclick="onAutoOkClick(\'' + esc(item.stationNo) + '\',\'' + esc(item.sapCode) + '\',\'' + esc(item.OrderNo) + '\')">自动OK</button>';
+                html += '<button type="button" class="ftl-btn-autook" onclick="onAutoOkClick(\'' + esc(item.stationNo) + '\',\'' + esc(item.sapCode) + '\',\'' + esc(item.OrderNo) + '\')">赋合格</button>';
                 html += '</div>';
             }
             html += '</div>'; // ftl-panel-item

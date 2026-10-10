@@ -353,7 +353,7 @@ function GetResultTxt(item) {
 function actionButtons(item) {
     var args = '\'' + esc(item.stationNo) + '\',\'' + esc(item.productCode) + '\',\'' + esc(item.OrderNo) + '\'';
     return '<button type="button" class="ftl-btn-check" onclick="onCheckClick(' + args + ')">检查</button>' +
-        '<button type="button" class="ftl-btn-autook" onclick="onAutoOkClick(' + args + ')">自动OK</button>';
+        '<button type="button" class="ftl-btn-autook" onclick="onAutoOkClick(' + args + ')">赋合格</button>';
 }
 
 // ===== 面板视图渲染（台车号ごとにカード表示。台车号はカードヘッダ、其余10项目を表示）=====

@@ -170,6 +170,9 @@
     color: #fff;
     border: none;
     cursor: pointer;
+    width:90px;
+
+
 }
 
 .ftl-btn-autook {
@@ -180,6 +183,7 @@
     border: none;
     cursor: pointer;
     margin-left: 4px;
+    float:right;
 }
 
 /* ===== AGV 呼叫确认ダイアログ ===== */
