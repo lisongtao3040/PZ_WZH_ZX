@@ -20,6 +20,15 @@ Public Class t_FullTrayListBC
             dtTray.Columns.Add("line_name", GetType(String))
         End If
 
+        If Not dtTray.Columns.Contains("sortKey1") Then
+            dtTray.Columns.Add("sortKey1", GetType(String))
+        End If
+
+        If Not dtTray.Columns.Contains("sortKey2") Then
+            dtTray.Columns.Add("sortKey2", GetType(String))
+        End If
+
+
         ' m_line から line_cd→line_name 辞書を作成してマージ
         Dim dtLine As DataTable = DA.GetLineNames()
         Dim lineDict As New Dictionary(Of String, String)(StringComparer.OrdinalIgnoreCase)
@@ -33,6 +42,7 @@ Public Class t_FullTrayListBC
             Dim cd As String = row("lineCodeShort").ToString().Trim()
             row("line_name") = If(lineDict.ContainsKey(cd), lineDict(cd), "")
         Next
+
 
         ' dtTray から OrderNo を重複排除で収集
         Dim noSet As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase)
@@ -70,7 +80,39 @@ Public Class t_FullTrayListBC
             End If
         Next
 
-        Return dtTray
+        ' 工单号（OrderNo）でマージ
+        For Each row As DataRow In dtTray.Rows
+            Dim orderNo As String = row("OrderNo").ToString().Trim()
+            row("sortKey2") = "4"
+            row("result") = If(resultDict.ContainsKey(orderNo), resultDict(orderNo), "")
+
+            If row("result") = "" Then
+                row("sortKey2") = "1"
+            ElseIf row("result") = "待" Then
+                row("sortKey2") = "2"
+            ElseIf row("result") = "NG" Then
+                row("sortKey2") = "3"
+            ElseIf row("result") = "OK" Then
+                row("sortKey2") = "4"
+            End If
+        Next
+
+        For Each row As DataRow In dtTray.Rows
+
+            If dtTray.Select("trayNo='" & row("trayNo") & "' AND (sortKey2='1' or sortKey2='2')").Length > 0 Then
+                row("sortKey1") = "1"
+            Else
+                row("sortKey1") = "2"
+            End If
+
+        Next
+
+        Dim dv As DataView = dtTray.DefaultView
+        dv.Sort = "sortKey1 ASC, trayNo ASC, sortKey2 DESC"
+
+        Return dv.ToTable
+
+        'Return dtTray
     End Function
 
 End Class

@@ -237,7 +237,7 @@ function renderRowView(data) {
         '<thead><tr>' +
         '<th>台车号</th><th>站点号</th>' +
         '<th class="ftl-sort-cd" onclick="toggleCdSort()" title="点击按CD排序">生产线号/CD <span class="ftl-sort-arrow">' + (ftlCdDir === 1 ? '▲' : (ftlCdDir === -1 ? '▼' : '⇅')) + '</span></th>' +
-        '<th>生产线名</th><th>工单号</th><th>储备计划</th><th>初检</th><th>三方</th><th>操作</th>' +
+        '<th>生产线名</th><th>工单号</th><th>储备计划</th><th>初检</th><th>三方</th><th>操作</th><th>结果</th>' +
         '</tr></thead>' +
         '<tbody>';
 
@@ -271,6 +271,17 @@ function renderRowView(data) {
                 html += '<button type="button" class="ftl-btn-autook" onclick="onAutoOkClick(\'' + esc(item.stationNo) + '\',\'' + esc(item.sapCode) + '\',\'' + esc(item.OrderNo) + '\')">赋合格</button>';
             }
             html += '</td>';
+            //html += '<td>' + GetResultTxt(item) + '</td>';
+
+            if( GetResultTxt(item)=='OK'){
+                html += '<td style="color:green">' + String(item.result).trim() + '</td>';
+            }else if( GetResultTxt(item)==''){
+                html += '<td>未</td>';
+            }else{
+                html += '<td>' + GetResultTxt(item) + '</td>';
+            }
+
+
             html += '</tr>';
         });
     });
@@ -279,6 +290,15 @@ function renderRowView(data) {
     $('#rowViewBody').html(html);
 }
 
+function GetResultTxt(item) {
+    if(String(item.result).trim() == ''){
+		return '未检';
+	}else if(String(item.result).trim() == '待'){
+		return '检查中';
+	}else{
+		return String(item.result).trim();
+	}
+}
 // ===== 面板视图渲染（台车号/站点号/生产线号/生产线名/工单号/CD/储备计划/初检/三方 + 操作）=====
 function renderPanelView(data) {
     var g = groupByTray(data);

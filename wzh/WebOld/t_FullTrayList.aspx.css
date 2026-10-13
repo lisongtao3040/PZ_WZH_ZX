@@ -311,6 +311,7 @@
 .col-bian      { width: 90px; }  /* 储备计划(BianCode) */
 .col-first     { width: 60px; }   /* 初检 */
 .col-third     { width: 60px; }   /* 三方 */
+.col-action     { width: 220px;}   /* 三方 */
 /* .col-action 不指定宽度：自动占用表格剩余宽度（1180-990=190px），避免其它列被拉伸 */
 
 /* CD 表头排序 */
@@ -332,7 +333,7 @@
 .ftl-row-table {
     /* 表格总宽固定 1180px：8个固定列之和 990px(80+80+300+130+110+110+90+90) + 操作列 190px。
        不使用 width:100%，避免列宽随画面大小被拉伸/压缩 */
-    width: 1180px;
+    width: 1280px;
     border-collapse: collapse;
     table-layout: fixed;
 }

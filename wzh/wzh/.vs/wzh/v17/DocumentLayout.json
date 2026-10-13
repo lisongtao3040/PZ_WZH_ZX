@@ -3,6 +3,12 @@
   "WorkspaceRootPath": "D:\\Github_lis3040\\PZ_WZH_ZX\\wzh\\wzh\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{F9ED7CDF-3CAC-5456-AC6D-6C743E21BBD3}|D:\\Github_lis3040\\PZ_WZH_ZX\\wzh\\WebOld|d:\\github_lis3040\\pz_wzh_zx\\wzh\\webold\\app_code\\bc\\t_fulltraylistbc.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F9ED7CDF-3CAC-5456-AC6D-6C743E21BBD3}|D:\\Github_lis3040\\PZ_WZH_ZX\\wzh\\WebOld|d:\\github_lis3040\\pz_wzh_zx\\wzh\\webold\\app_code\\bc\\t_fulltraylistpzbc.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{F9ED7CDF-3CAC-5456-AC6D-6C743E21BBD3}|D:\\Github_lis3040\\PZ_WZH_ZX\\wzh\\WebOld|d:\\github_lis3040\\pz_wzh_zx\\wzh\\webold\\t_check_list.aspx.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
     },
     {
@@ -32,7 +38,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 7,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Bookmark",
@@ -56,7 +62,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 0,
+              "Title": "t_FullTrayListBC.vb",
+              "DocumentMoniker": "D:\\Github_lis3040\\PZ_WZH_ZX\\wzh\\WebOld\\App_Code\\BC\\t_FullTrayListBC.vb",
+              "RelativeDocumentMoniker": "..\\WebOld\\App_Code\\BC\\t_FullTrayListBC.vb",
+              "ToolTip": "D:\\Github_lis3040\\PZ_WZH_ZX\\wzh\\WebOld\\App_Code\\BC\\t_FullTrayListBC.vb",
+              "RelativeToolTip": "..\\WebOld\\App_Code\\BC\\t_FullTrayListBC.vb",
+              "ViewState": "AgIAAEcAAAAAAAAAAAAqwGoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2026-10-13T06:46:25.237Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
               "Title": "t_check_list.aspx.js",
               "DocumentMoniker": "D:\\Github_lis3040\\PZ_WZH_ZX\\wzh\\WebOld\\t_check_list.aspx.js",
               "RelativeDocumentMoniker": "..\\WebOld\\t_check_list.aspx.js",
@@ -68,19 +87,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 3,
               "Title": "t_check_list.aspx",
               "DocumentMoniker": "D:\\Github_lis3040\\PZ_WZH_ZX\\wzh\\WebOld\\t_check_list.aspx",
               "RelativeDocumentMoniker": "..\\WebOld\\t_check_list.aspx",
               "ToolTip": "D:\\Github_lis3040\\PZ_WZH_ZX\\wzh\\WebOld\\t_check_list.aspx",
               "RelativeToolTip": "..\\WebOld\\t_check_list.aspx",
+              "LogicalView": "7651a703-06e5-11d1-8ebd-00a0c90f26ea",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000195|",
               "WhenOpened": "2026-09-16T07:29:28.173Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 2,
               "Title": "t_check_list.aspx.vb",
               "DocumentMoniker": "D:\\Github_lis3040\\PZ_WZH_ZX\\wzh\\WebOld\\t_check_list.aspx.vb",
               "RelativeDocumentMoniker": "..\\WebOld\\t_check_list.aspx.vb",
@@ -93,7 +113,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 5,
               "Title": "FileServ.aspx.vb",
               "DocumentMoniker": "D:\\Github\\lisongtao3040\\PZ_WZH_ZX\\wzh\\WebOld\\FileServ.aspx.vb",
               "RelativeDocumentMoniker": "..\\..\\..\\..\\Github\\lisongtao3040\\PZ_WZH_ZX\\wzh\\WebOld\\FileServ.aspx.vb",
@@ -104,7 +124,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 7,
               "Title": "Default.aspx.vb",
               "DocumentMoniker": "D:\\Github\\lisongtao3040\\PZ_WZH_ZX\\wzh\\WebOld\\Default.aspx.vb",
               "RelativeDocumentMoniker": "..\\..\\..\\..\\Github\\lisongtao3040\\PZ_WZH_ZX\\wzh\\WebOld\\Default.aspx.vb",
@@ -115,7 +135,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 6,
               "Title": "SqlHelper.vb",
               "DocumentMoniker": "D:\\Github_lis3040\\PZ_WZH_ZX\\wzh\\wzh\\SqlHelper\\SqlHelper.vb",
               "RelativeDocumentMoniker": "SqlHelper\\SqlHelper.vb",
@@ -127,7 +147,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 8,
               "Title": "ComDDL.vb",
               "DocumentMoniker": "D:\\Github\\lisongtao3040\\PZ_WZH_ZX\\wzh\\WebOld\\App_Code\\ComDDL.vb",
               "RelativeDocumentMoniker": "..\\..\\..\\..\\Github\\lisongtao3040\\PZ_WZH_ZX\\wzh\\WebOld\\App_Code\\ComDDL.vb",
@@ -135,6 +155,40 @@
               "RelativeToolTip": "..\\..\\..\\..\\Github\\lisongtao3040\\PZ_WZH_ZX\\wzh\\WebOld\\App_Code\\ComDDL.vb",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
               "WhenOpened": "2026-09-11T02:08:28.125Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "FloatingWindowState": {
+        "Id": "c51f0ab7-d2d9-444a-9385-f17c4c4af052",
+        "Display": 2,
+        "X": 371,
+        "Y": 40,
+        "Width": 1479,
+        "Height": 914,
+        "WindowState": 0
+      },
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "t_FullTrayListPZBC.vb",
+              "DocumentMoniker": "D:\\Github_lis3040\\PZ_WZH_ZX\\wzh\\WebOld\\App_Code\\BC\\t_FullTrayListPZBC.vb",
+              "RelativeDocumentMoniker": "..\\WebOld\\App_Code\\BC\\t_FullTrayListPZBC.vb",
+              "ToolTip": "D:\\Github_lis3040\\PZ_WZH_ZX\\wzh\\WebOld\\App_Code\\BC\\t_FullTrayListPZBC.vb",
+              "RelativeToolTip": "..\\WebOld\\App_Code\\BC\\t_FullTrayListPZBC.vb",
+              "ViewState": "AgIAAFkAAAAAAAAAAAAUwIQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2026-10-13T06:46:14.758Z",
+              "EditorCaption": ""
             }
           ]
         }
