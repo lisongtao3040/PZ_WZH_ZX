@@ -48,7 +48,7 @@ Public Class BackUpChkPiao
         'Return
 
         ' For z As Integer = 0 To 7
-        For z As Integer = 1 To 7
+        For z As Integer = 1 To 1
             SetXls("", z)
             For i As Integer = 1 To 4
                 SetXls(i.ToString, z)

@@ -275,6 +275,8 @@ function renderRowView(data) {
 
             if( GetResultTxt(item)=='OK'){
                 html += '<td style="color:green">' + String(item.result).trim() + '</td>';
+			}else if( GetResultTxt(item)=='NG'){
+                html += '<td style="color:red">' + String(item.result).trim() + '</td>';
             }else if( GetResultTxt(item)==''){
                 html += '<td>未</td>';
             }else{

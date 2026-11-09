@@ -302,6 +302,8 @@ function cellHtml(col, item) {
     if (col.key === '__result') {
 		if( GetResultTxt(item)=='OK'){
 			return '<td style="color:green">' + String(item.result).trim() + '</td>';
+		}else if( GetResultTxt(item)=='OK'){
+			return '<td style="color:red">' + String(item.result).trim() + '</td>';
 		}else if( GetResultTxt(item)==''){
 			return '<td>未</td>';
 		}else{
